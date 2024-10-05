@@ -1,0 +1,102 @@
+[gd_scene load_steps=4 format=3 uid="uid://bx5ab1niqnstq"]
+
+[ext_resource type="Script" path="res://scripts/deck_builder.gd" id="1_tkoon"]
+[ext_resource type="Script" path="res://scripts/DataLoader.gd" id="2_dor15"]
+[ext_resource type="Script" path="res://scripts/CustomItemList.gd" id="3_omxne"]
+
+[node name="deck_builder" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_tkoon")
+
+[node name="DataLoader" type="Node" parent="."]
+script = ExtResource("2_dor15")
+
+[node name="MainContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 1153.0
+offset_bottom = 645.0
+
+[node name="CardListContainer" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonContainer2" type="HBoxContainer" parent="MainContainer/CardListContainer"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="MainContainer/CardListContainer/ButtonContainer2"]
+layout_mode = 2
+size_flags_vertical = 8
+text = "Return Home"
+
+[node name="FeatureFilter" type="OptionButton" parent="MainContainer/CardListContainer/ButtonContainer2"]
+layout_mode = 2
+
+[node name="LevelFilter" type="OptionButton" parent="MainContainer/CardListContainer/ButtonContainer2"]
+layout_mode = 2
+
+[node name="CharacterFilter" type="OptionButton" parent="MainContainer/CardListContainer/ButtonContainer2"]
+layout_mode = 2
+
+[node name="TypeFilter" type="OptionButton" parent="MainContainer/CardListContainer/ButtonContainer2"]
+layout_mode = 2
+
+[node name="ResetFilterButton" type="Button" parent="MainContainer/CardListContainer/ButtonContainer2"]
+layout_mode = 2
+text = "Reset Filter"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/CardListContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="AvailableCardList" type="ItemList" parent="MainContainer/CardListContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("3_omxne")
+
+[node name="ButtonContainer" type="HBoxContainer" parent="MainContainer/CardListContainer"]
+layout_mode = 2
+size_flags_vertical = 2
+
+[node name="DeckSaveName" type="LineEdit" parent="MainContainer/CardListContainer/ButtonContainer"]
+layout_mode = 2
+placeholder_text = "deck name here"
+expand_to_text_length = true
+
+[node name="SaveButton" type="Button" parent="MainContainer/CardListContainer/ButtonContainer"]
+layout_mode = 2
+text = "Save Deck"
+
+[node name="LoadDeckOptions" type="OptionButton" parent="MainContainer/CardListContainer/ButtonContainer"]
+layout_mode = 2
+
+[node name="LoadButton" type="Button" parent="MainContainer/CardListContainer/ButtonContainer"]
+layout_mode = 2
+text = "Load Deck
+"
+
+[node name="ClearButton" type="Button" parent="MainContainer/CardListContainer/ButtonContainer"]
+layout_mode = 2
+text = "Clear Deck"
+
+[node name="ScrollContainer2" type="ScrollContainer" parent="MainContainer/CardListContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DeckList" type="ItemList" parent="MainContainer/CardListContainer/ScrollContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("3_omxne")
+
+[node name="CardPreview" type="TextureRect" parent="MainContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DeckListContainer" type="VBoxContainer" parent="MainContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3

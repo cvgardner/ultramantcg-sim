@@ -1,0 +1,300 @@
+[
+	{
+		"card_name": "Ultraman Dyna, Flash Type",
+		"card_no": "SD01-001",
+		"character": "DYNA",
+		"feature": "Ultra Hero",
+		"level": 3,
+		"type": "SPEED",
+		"bp": {
+			"single": 9000,
+			"double": 11000,
+			"triple": 16000
+		},
+		"abilities": [
+			{
+				"trigger": "ENTER_PLAY",
+				"stack_condition": ["double", "triple"],
+				"target": {
+					"card_no": ["SD01-014"],
+					"character": ["TIGA", "GAIA"]
+				},
+				"effect": [{
+					"DECK_SEARCH_DISCARD": 3
+			}]
+			}
+		],
+		"image_path": "res://images/cards/SD01/SD01-001.webp"
+	},
+	{
+		"card_name": "Ultraman Tiga, Multi Type",
+		"card_no": "SD01-002",
+		"character": "TIGA",
+		"feature": "Ultra Hero",
+		"level": 3,
+		"type": "BASIC",
+		"bp": {
+			"single": 9000,
+			"double": 12000,
+			"triple": 17000
+		},
+		"abilities": [
+			{
+				"trigger": "ACTIVATE",
+				"stack_condition": ["triple"],
+				"target": "BATTLE_OPPONENT",
+				"cost": {
+					"DISCARD": 1
+				},
+				"effect": [{
+					"BP_GRADE_DOWN": 1
+			}]
+			}
+		],
+		"image_path": "res://images/cards/SD01/SD01-002.webp"
+	},
+	{
+		"card_name": "Ultraman Gaia, V2",
+		"card_no": "SD01-003",
+		"character": "GAIA",
+		"feature": "Ultra Hero",
+		"level": 3,
+		"type": "BASIC",
+		"bp": {
+			"single": 9000,
+			"double": 11000,
+			"triple": 16000
+		},
+		"abilities": [
+			{
+				"trigger": "ENTER_PLAY",
+				"stack_condition": ["double", "triple"],
+				"target": {
+					"card_no": ["SD01-014"],
+					"character": ["TIGA", "DYNA"]
+				},
+				"effect": [{
+					"DECK_SEARCH_DISCARD": 3
+			}]
+			}
+		],
+		"image_path": "res://images/cards/SD01/SD01-003.webp"
+	},
+	{
+		"card_name": "Ultraman Tiga, Multi Type",
+		"card_no": "SD01-004",
+		"character": "TIGA",
+		"feature": "Ultra Hero",
+		"level": 1,
+		"type": "SPEED",
+		"bp": {
+			"single": 5000
+		},
+		"abilities": [
+		],
+		"image_path": "res://images/cards/SD01/SD01-004.webp"
+	},
+	{
+		"card_name": "Ultraman Tiga, Multi Type",
+		"card_no": "SD01-005",
+		"character": "TIGA",
+		"feature": "Ultra Hero",
+		"level": 2,
+		"type": "BASIC",
+		"bp": {
+			"single": 7000,
+			"double": 10000,
+			"triple": 14000
+		},
+		"abilities": [
+			{
+				"trigger": "CONTINUOUS",
+				"stack_condition": ["single", "double"],
+				"extra_condition": ["opponent_type_power"],
+				"target": "SELF",
+				"effect": [{
+					"BP_GRADE_UP": 1
+				}]
+			}
+		],
+		"image_path": "res://images/cards/SD01/SD01-005.webp"
+	},
+	{
+		"card_name": "Ultraman Tiga, Zeperion Beam",
+		"card_no": "SD01-006",
+		"character": "TIGA",
+		"feature": "Ultra Hero",
+		"level": 2,
+		"type": "BASIC",
+		"bp": {
+			"single": 8000,
+			"double": 10000
+		},
+		"abilities": [
+		],
+		"image_path": "res://images/cards/SD01/SD01-006.webp"
+	},
+	{
+		"card_name": "Ultraman Dyna, Flash Type",
+		"card_no": "SD01-007",
+		"character": "DYNA",
+		"feature": "Ultra Hero",
+		"level": 1,
+		"type": "BASIC",
+		"bp": {
+			"single": 5000
+		},
+		"abilities": [
+		],
+		"image_path": "res://images/cards/SD01/SD01-007.webp"
+	},
+	{
+		"card_name": "Ultraman Dyna, Flash Type",
+		"card_no": "SD01-008",
+		"character": "DYNA",
+		"feature": "Ultra Hero",
+		"level": 2,
+		"type": "SPEED",
+		"bp": {
+			"single": 7000,
+			"double": 10000,
+			"triple": 14000
+		},
+		"abilities": [
+			{
+				"trigger": "CONTINUOUS",
+				"stack_condition": ["single", "double"],
+				"extra_condition": ["opponent_type_armed"],
+				"target": "SELF",
+				"effect": [{
+					"BP_GRADE_UP": 1
+				}]
+			}
+		],
+		"image_path": "res://images/cards/SD01/SD01-008.png"
+	},
+	{
+		"card_name": "Ultraman Dyna, Solgent Beam",
+		"card_no": "SD01-009",
+		"character": "DYNA",
+		"feature": "Ultra Hero",
+		"level": 2,
+		"type": "BASIC",
+		"bp": {
+			"single": 8000,
+			"double": 10000
+		},
+		"abilities": [
+		],
+		"image_path": "res://images/cards/SD01/SD01-009.webp"
+	},
+	{
+		"card_name": "Ultraman Gaia, V2",
+		"card_no": "SD01-010",
+		"character": "GAIA",
+		"feature": "Ultra Hero",
+		"level": 1,
+		"type": "POWER",
+		"bp": {
+			"single": 5000
+		},
+		"abilities": [
+		],
+		"image_path": "res://images/cards/SD01/SD01-010.webp"
+	},
+	{
+		"card_name": "Ultraman Gaia, Photon Edge",
+		"card_no": "SD01-011",
+		"character": "GAIA",
+		"feature": "Ultra Hero",
+		"level": 2,
+		"type": "POWER",
+		"bp": {
+			"single": 8000,
+			"double": 11000,
+			"triple": 13000
+		},
+		"abilities": [
+			{
+				"trigger": "CONTINUOUS",
+				"stack_condition": ["single", "double"],
+				"extra_condition": ["opponent_type_speed"],
+				"target": "SELF",
+				"effect": [{
+					"BP_GRADE_UP": 1
+				}]
+			}
+		],
+		"image_path": "res://images/cards/SD01/SD01-011.webp"
+	},
+	{
+		"card_name": "Satan Bizor, The Giant Aberrant Beast",
+		"card_no": "SD01-012",
+		"character": "SATAN BIZOR",
+		"feature": "Ultra Kaiju",
+		"level": 6,
+		"type": "HAZARD",
+		"bp": {
+			"single": 10000,
+			"double": 16000,
+			"extra": 8000
+		},
+		"abilities": [
+			{
+				"trigger": "CONTINUOUS",
+				"stack_condition": ["single", "double"],
+				"extra_condition": ["opponent_type_basic"],
+				"target": "SELF",
+				"effect": [{
+					"BP_GRADE_EXTRA": 0
+				}]
+			}
+		],
+		"image_path": "res://images/cards/SD01/SD01-012.webp"
+	},
+	{
+		"card_name": "King of Mons, The Strongest Combined Monster",
+		"card_no": "SD01-013",
+		"character": "KING OF MONS",
+		"feature": "Ultra Kaiju",
+		"level": 6,
+		"type": "HAZARD",
+		"bp": {
+			"single": 9000,
+			"double": 15000
+		},
+		"abilities": [
+			{
+				"trigger": "ENTER_PLAY",
+				"stack_condition": ["single"],
+				"target": "OPPONENT_SCENE_0",
+				"effect": [{
+					"DISCARD": 0
+				}]
+			}
+		],
+		"image_path": "res://images/cards/SD01/SD01-013.webp"
+	},
+	{
+		"card_name": "Ultraman Tiga, Ultraman Dyna and Ultraman Gaia: The Battle in Hyper Space",
+		"card_no": "SD01-014",
+		"character": "",
+		"feature": "Scene",
+		"level": 1,
+		"type": "",
+		"bp": {
+
+		},
+		"abilities": [
+			{
+				"trigger": "ACTIVATE",
+				"limit": "ONCE_PER_TURN",
+				"target": ["TIGA", "DYNA", "GAIA"],
+				"effect": [{
+					"BP_PLUS": 1000
+				}]
+			}
+		],
+		"image_path": "res://images/cards/SD01/SD01-014.webp"
+	},
+]

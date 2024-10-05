@@ -1,0 +1,36 @@
+[
+	{
+		"card_name": "Ultraman Arc",
+		"card_no": "BP01-012",
+		"character": "ARC",
+		"feature": "Ultra Hero",
+		"level": 1,
+		"type": "BASIC",
+		"bp": {
+			"single": 5000
+		},
+		"abilities": [],
+		"image_path": "res://images/cards/BP01-012.webp"
+	},
+	{
+		"card_name": "The Ancient Monster Gomora",
+		"card_no": "PR-004",
+		"character": "GOMORA",
+		"feature": "Ultra Kaiju",
+		"level": 5,
+		"type": "HAZARD",
+		"bp": {
+			"single": 9000,
+			"double": 12000
+		},
+		"abilities": [
+			{
+				"trigger": "ENTER_PLAY",
+				"condition": "SINGLE",
+				"target": "SELF",
+				"effect": "BP_GRADE_UP"
+			}
+		],
+		"image_path": "res://images/cards/PR-004.png"
+	},
+]

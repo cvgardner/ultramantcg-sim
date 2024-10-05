@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=3 uid="uid://o6sd0ovt6hsm"]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_m4717"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_m4717")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="DeckSelectButton" type="OptionButton" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="FindMatchButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Find Match"
+
+[node name="DeckEditButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Edit Deck"
+
+[node name="PracticeButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Practice Mode"
+
+[node name="ContactButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Report Bug"
+
+[node name="DonateButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Donate"

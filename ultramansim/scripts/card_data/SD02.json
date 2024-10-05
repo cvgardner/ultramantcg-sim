@@ -1,0 +1,294 @@
+[
+    {
+		"card_name": "Ultraman Z, Alpha Edge",
+		"card_no": "SD02-001",
+		"character": "Z",
+		"feature": "Ultra Hero",
+		"level": 3,
+		"type": "POWER",
+		"bp": {
+			"single": 7000,
+			"double": 13000,
+			"triple": 16000
+		},
+		"abilities": [
+			{
+				"trigger": "CONTINUOUS",
+				"stack_condition": ["single", "double"],
+                "extra_condition": ["opponent_type_speed", "opponent_type_armed"],
+				"target": "SELF",
+				"effect": [{
+					"BP_GRADE_UP": 1
+			}]
+			}
+		],
+		"image_path": "res://images/cards/SD02/SD02-001.webp"
+	},
+    {
+		"card_name": "Ultraman Zero, Ultra Zero Mantle",
+		"card_no": "SD02-002",
+		"character": "ARMED",
+		"feature": "Ultra Hero",
+		"level": 3,
+		"type": "POWER",
+		"bp": {
+			"single": 7000,
+			"double": 13000,
+			"triple": 16000
+		},
+		"abilities": [
+			{
+				"trigger": "CONTINUOUS",
+				"stack_condition": ["single", "double"],
+                "extra_condition": ["opponent_type_basic", "opponent_type_armed"],
+				"target": "SELF",
+				"effect": [{
+					"BP_GRADE_UP": 1
+			}]
+			}
+		],
+		"image_path": "res://images/cards/SD02/SD02-002.webp"
+	},
+    {
+		"card_name": "Ultraman Geed, Galaxy Rising",
+		"card_no": "SD02-003",
+		"character": "GEED",
+		"feature": "Ultra Hero",
+		"level": 3,
+		"type": "POWER",
+		"bp": {
+			"single": 7000,
+			"double": 11000,
+			"triple": 17000
+		},
+		"abilities": [
+			{
+				"trigger": "ENTERS_PLAY",
+				"stack_condition": ["single", "double"],
+                "extra_condition": ["target_double"],
+				"target": ["GEED"],
+				"effect": [{
+					"BP_GRADE_UP": 1
+			}]
+			}
+		],
+		"image_path": "res://images/cards/SD02/SD02-003.webp"
+	},
+    {
+		"card_name": "Ultraman Zero, Ultra Zero Mantle",
+		"card_no": "SD02-004",
+		"character": "ZERO",
+		"feature": "Ultra Hero",
+		"level": 1,
+		"type": "SPEED",
+		"bp": {
+			"single": 5000
+		},
+		"abilities": [
+		],
+		"image_path": "res://images/cards/SD02/SD02-004.webp"
+	},
+    {
+		"card_name": "Ultraman Zero, Emerium Slash",
+		"card_no": "SD02-005",
+		"character": "ZERO",
+		"feature": "Ultra Hero",
+		"level": 2,
+		"type": "POWER",
+		"bp": {
+			"single": 7000,
+			"double": 10000,
+			"triple": 14000
+		},
+		"abilities": [
+			{
+				"trigger": "CONTINUOUS",
+				"stack_condition": ["single", "double"],
+                "extra_condition": ["opponent_type_armed"],
+				"target": "SELF",
+				"effect": [{
+					"BP_GRADE_UP": 1
+			}]
+			}
+		],
+		"image_path": "res://images/cards/SD02/SD02-005.webp"
+	},
+    {
+		"card_name": "Ultraman Zero, Wide Shot",
+		"card_no": "SD02-006",
+		"character": "ZERO",
+		"feature": "Ultra Hero",
+		"level": 2,
+		"type": "BASIC",
+		"bp": {
+			"single": 7000,
+			"double": 11000
+		},
+		"abilities": [
+		],
+		"image_path": "res://images/cards/SD02/SD02-006.webp"
+	},
+    {
+		"card_name": "Ultraman Geed, Galaxy Rising",
+		"card_no": "SD02-007",
+		"character": "GEED",
+		"feature": "Ultra Hero",
+		"level": 1,
+		"type": "BASIC",
+		"bp": {
+			"single": 5000
+		},
+		"abilities": [
+		],
+		"image_path": "res://images/cards/SD02/SD02-007.webp"
+	},
+    {
+		"card_name": "Ultraman Geed, Galaxy Burst",
+		"card_no": "SD02-008",
+		"character": "GEED",
+		"feature": "Ultra Hero",
+		"level": 2,
+		"type": "SPEED",
+		"bp": {
+			"single": 7000,
+			"double": 10000,
+			"triple": 14000
+		},
+		"abilities": [
+			{
+				"trigger": "CONTINUOUS",
+				"stack_condition": ["single", "double"],
+				"extra_condition": ["opponent_type_armed"],
+                "target": "SELF",
+				"effect": [{
+					"BP_GRADE_UP": 1
+			}]
+			}
+		],
+		"image_path": "res://images/cards/SD02/SD02-008.webp"
+	},
+    {
+		"card_name": "Ultraman Geed, Wrecking Phoenix",
+		"card_no": "SD02-009",
+		"character": "GEED",
+		"feature": "Ultra Hero",
+		"level": 2,
+		"type": "BASIC",
+		"bp": {
+			"single": 5000,
+			"double": 11000
+		},
+		"abilities": [
+		],
+		"image_path": "res://images/cards/SD02/SD02-009.webp"
+	},
+    {
+		"card_name": "Ultraman Z, Z Slugger",
+		"card_no": "SD02-010",
+		"character": "Z",
+		"feature": "Ultra Hero",
+		"level": 1,
+		"type": "BASIC",
+		"bp": {
+			"single": 5000
+		},
+		"abilities": [
+		],
+		"image_path": "res://images/cards/SD02/SD02-010.webp"
+	},
+    {
+		"card_name": "Ultraman Z, Z Lance Arrow",
+		"card_no": "SD02-011",
+		"character": "Z",
+		"feature": "Ultra Hero",
+		"level": 2,
+		"type": "SPEED",
+		"bp": {
+			"single": 7000,
+			"double": 10000,
+			"triple": 14000
+		},
+		"abilities": [
+			{
+				"trigger": "CONTINUOUS",
+				"stack_condition": ["single", "double"],
+				"extra_condition": ["opponent_type_armed"],
+                "target": "SELF",
+				"effect": [{
+					"BP_GRADE_UP": 1
+			}]
+			}
+		],
+		"image_path": "res://images/cards/SD02/SD02-011.webp"
+	},
+    {
+		"card_name": "Skull Gomora, The Belial Fusion Monster",
+		"card_no": "SD02-012",
+		"character": "SKULL GOMORA",
+		"feature": "Ultra Kaiju",
+		"level": 6,
+		"type": "HAZARD",
+		"bp": {
+			"single": 10000,
+			"double": 16000,
+			"extra": 8000
+		},
+		"abilities": [
+			{
+				"trigger": "CONTINUOUS",
+				"stack_condition": ["single", "double"],
+				"extra_condition": ["opponent_type_basic"],
+                "target": "SELF",
+				"effect": [{
+					"BP_GRADE_EXTRA": 0
+			}]
+			}
+		],
+		"image_path": "res://images/cards/SD02/SD02-012.webp"
+	},
+    {
+		"card_name": "Pendanium Zetton, The Belial Fusion Monster",
+		"card_no": "SD02-013",
+		"character": "PENDANIUM ZETTON",
+		"feature": "Ultra Kaiju",
+		"level": 6,
+		"type": "HAZARD",
+		"bp": {
+			"single": 9000,
+			"double": 15000
+		},
+		"abilities": [
+			{
+				"trigger": "ENTER_PLAY",
+				"stack_condition": ["single"],
+				"target": "OPPONENT_SCENE_1",
+				"effect": [{
+					"DISCARD": 0
+				}]
+			}
+		],
+		"image_path": "res://images/cards/SD02/SD02-013.webp"
+	},
+    {
+		"card_name": "His Majesty's Medal",
+		"card_no": "SD02-014",
+		"character": "",
+		"feature": "Scene",
+		"level": 0,
+		"type": "",
+		"bp": {
+
+		},
+		"abilities": [
+			{
+				"trigger": "ACTIVATE",
+                "limit": "ONCE_PER_TURN",
+				"target": ["ZERO", "GEED", "Z"],
+				"effect": [{
+					"BATTLE_OPPONENT_CHANGE_TYPE": "ARMED"
+				}]
+			}
+		],
+		"image_path": "res://images/cards/SD02/SD02-014.webp"
+	},
+]
