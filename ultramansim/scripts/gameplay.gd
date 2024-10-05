@@ -78,8 +78,9 @@ func _on_connection_failed():
 
 # Connect signals for peer connection events
 func _init():
-	get_tree().multiplayer.connect("peer_connected", self, "_on_peer_connected")
-	get_tree().multiplayer.connect("peer_disconnected", self, "_on_peer_disconnected")
-	get_tree().multiplayer.connect("connection_failed", self, "_on_connection_failed")
+	pass
+	#get_tree().multiplayer.connect("peer_connected", self, "_on_peer_connected")
+	#get_tree().multiplayer.connect("peer_disconnected", self, "_on_peer_disconnected")
+	#get_tree().multiplayer.connect("connection_failed", self, "_on_connection_failed")
 
 # --- end code for Microsoft Copilot --- #
