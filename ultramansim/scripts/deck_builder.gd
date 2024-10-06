@@ -214,7 +214,7 @@ func _remove_card_from_deck(index):
 	if not result:
 		print("ERROR: Card does not exist in deck")
 	update_deck_list_ui()
-	
+	 
 func _preview_card(item):
 	if item != 'none':
 		card_preview.set_visible(true)
