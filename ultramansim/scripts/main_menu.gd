@@ -14,9 +14,9 @@ func _on_DeckEditButton_pressed():
 	
 func _on_PracticeButton_pressed():
 	'''Switch to Gameplay Scene'''
-	get_tree().change_scene_to_file("res://scenes/gameplay.tscn")
+	get_tree().change_scene_to_file("res://scenes/room_creation.tscn")
 
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+#func _process(delta: float) -> void:
+	#pass

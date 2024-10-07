@@ -88,10 +88,16 @@ func _process(delta):
 		if not recieved_peer_info:
 			if packet_string.begins_with(SERVER_INFO):
 				server_udp.close()
-				packet_string = packet_string.right(6)
 				if packet_string.length() > 2:
 					var m = packet_string.split(":")
-					peer[m[0]] = {"port":m[2], "address":m[1]}
+					var peer_name = m[1]
+					var peer_address = m[2]
+					var peer_port = m[3]
+					peer[peer_name] = {
+						"port": peer_port,
+						"address": peer_address
+					}
+					print(peer_name, " ", peer[peer_name])
 					recieved_peer_info = true
 					start_peer_contact()
 
@@ -100,7 +106,7 @@ func _handle_greet_message(peer_name, peer_port, my_port):
 	if own_port != my_port:
 		own_port = my_port
 		peer_udp.close()
-		peer_udp.listen(own_port, "*")
+		peer_udp.bind(own_port, "*")
 	recieved_peer_greet = true
 
 
@@ -113,14 +119,15 @@ func _handle_confirm_message(peer_name, peer_port, my_port, is_host):
 		host_address = peer[peer_name].address
 		host_port = peer[peer_name].port
 	peer_udp.close()
-	peer_udp.listen(own_port, "*")
+	peer_udp.bind(own_port, "*")
 	recieved_peer_confirm = true
 
 
 func _handle_go_message(peer_name):
 	recieved_peer_go = true
-	emit_signal("hole_punched", int(own_port), int(host_port), host_address)
 	peer_udp.close()
+	server_udp.close()
+	emit_signal("hole_punched", int(own_port), int(host_port), host_address)
 	p_timer.stop()
 	set_process(false)
 
@@ -168,6 +175,8 @@ func _ping_peer():
 		gos_sent += 1
 
 		if gos_sent >= response_window: #the other player has confirmed and is probably waiting
+			peer_udp.close()
+			server_udp.close()
 			emit_signal("hole_punched", int(own_port), int(host_port), host_address)
 			p_timer.stop()
 			set_process(false)
@@ -178,7 +187,7 @@ func start_peer_contact():
 	server_udp.close()
 	if peer_udp.is_bound():
 		peer_udp.close()
-	var err = peer_udp.listen(own_port, "*")
+	var err = peer_udp.bind(own_port, "*")
 	if err != OK:
 		print("Error listening on port: " + str(own_port) +" Error: " + str(err))
 	p_timer.start()
