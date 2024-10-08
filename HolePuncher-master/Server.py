@@ -143,6 +143,7 @@ class Client:
 		self.received_peer_info = False
 
 if __name__ == '__main__':
+	print("Start", flush=True)
 	if len(sys.argv) < 2:
 		print("Usage: ./server.py PORT")
 		sys.exit(1)
