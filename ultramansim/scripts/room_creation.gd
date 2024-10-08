@@ -38,6 +38,7 @@ var num_players
 @onready var host_join_container = $LobbyContainer/HostJoinContainer
 @onready var room_code_container = $LobbyContainer/RoomCodeContainer
 @onready var lobby_info_container = $LobbyContainer/LobbyInfoContainer
+@onready var deck_select_button = $LobbyContainer/LobbyInfoContainer/VBoxContainer/DeckSelectButton
 
 func _ready():
 	room_code_container.hide()
@@ -49,6 +50,7 @@ func _ready():
 	#Connect Signals
 	$MainMenuButton.pressed.connect(_on_MainMenuButton_pressed)
 	
+	populate_deck_options()
 	setup_hole_punch()
 	
 func setup_hole_punch():
@@ -137,6 +139,41 @@ func _on_HolePunch_hole_punched(my_port, hosts_port, hosts_address):
 	print("Status: Connection successful, starting game!")
 	players_joined = 0
 	
+	if hole_puncher.is_host:
+		var peer = ENetMultiplayerPeer.new()
+		peer.create_server(own_port, 1)
+		get_tree().set_network_peer(peer)
+	else:
+		var peer = ENetMultiplayerPeer.new()
+		peer.create_client(host_address, host_port, 0, 0, 0 ,own_port)
+		get_tree().set_network_peer(peer)
+		
+func populate_deck_options():
+	'''Populates the option buttion LoadDeckOptions with decks from res://decks'''
+	deck_select_button.clear()
+	#Load deckselect info
+	deck_select_button.add_item("Select Deck")
+	deck_select_button.set_item_disabled(0, true)
+	
+	var dir = DirAccess.open('res://decks')
+	if dir:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		while file_name != "":
+			if not dir.current_is_dir():
+				deck_select_button.add_item(file_name.replace(".json", ""))
+			file_name = dir.get_next()
+		dir.list_dir_end()
+	else:
+		print("ERROR: Failed to open directory res://Decks")
+	make_option_button_items_non_radio_checkable(deck_select_button)
+	deck_select_button.selected = 0
+
+func make_option_button_items_non_radio_checkable(option_button: OptionButton) -> void:
+	var pm: PopupMenu = option_button.get_popup()
+	for i in pm.get_item_count():
+		if pm.is_item_radio_checkable(i):
+			pm.set_item_as_radio_checkable(i, false)	
 
 func _on_session_registered():
 	print("Session Registered")
