@@ -5,7 +5,6 @@ func _on_MainMenuButton_pressed():
 	'''Returns to main menu''' 
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 
-# ---- CODE from Microsoft COPILOT for pvp connection --- #
 
 # Define constants for the server and client roles
 const SERVER = true
@@ -15,11 +14,12 @@ const CLIENT = false
 const PORT = 4242
 
 # Variables to store the network peer and role
-var network_peer : ENetMultiplayerPeer
+var network_peer = ENetMultiplayerPeer.new()
 var role
 var room_code = ""
 var hole_puncher
 var player_id
+var players = []
 
 var own_port
 var host_address
@@ -43,12 +43,14 @@ var num_players
 func _ready():
 	room_code_container.hide()
 	lobby_info_container.hide()
+	#Connect Signals
 	host_button.pressed.connect(_on_host_button_pressed)
 	join_button.pressed.connect(_on_join_button_pressed)
 	cancel_button.pressed.connect(_on_cancel_button_pressed)
 	copy_connect_button.pressed.connect(_on_copy_connect_button_pressed)
-	#Connect Signals
 	$MainMenuButton.pressed.connect(_on_MainMenuButton_pressed)
+	network_peer.peer_connected.connect(_on_peer_connected)
+	network_peer.peer_disconnected.connect(_on_peer_disconnected)
 	
 	populate_deck_options()
 	setup_hole_punch()
@@ -137,16 +139,34 @@ func _on_HolePunch_hole_punched(my_port, hosts_port, hosts_address):
 	host_address = hosts_address
 	host_port = hosts_port
 	print("Status: Connection successful, starting game!")
-	players_joined = 0
 	
 	if hole_puncher.is_host:
-		var peer = ENetMultiplayerPeer.new()
-		peer.create_server(own_port, 1)
-		get_tree().set_network_peer(peer)
+		network_peer.create_server(own_port, 1)
+		get_tree().get_multiplayer().multiplayer_peer = network_peer
+		print("Host Network Peer Setup")
 	else:
-		var peer = ENetMultiplayerPeer.new()
-		peer.create_client(host_address, host_port, 0, 0, 0 ,own_port)
-		get_tree().set_network_peer(peer)
+		network_peer.create_client(host_address, host_port, 0, 0, 0 ,own_port)
+		get_tree().get_multiplayer().multiplayer_peer = network_peer
+		print("Client Network Peer Setup")
+
+	
+func populate_lobby_list():
+	var lobby_list = $LobbyContainer/LobbyInfoContainer/LobbyList
+	lobby_list.clear()
+	for player_name in players:
+		lobby_list.add_item(player_name)
+
+func _on_peer_connected(id):
+	print("Player Connected")
+	var player_name = "Ultra_" + str(id)
+	players.append(player_name)
+	populate_lobby_list()
+	
+func _on_peer_disconnected(id):
+	print("Player Disconnected")
+	var player_name = "Ultra_" + str(id)
+	players.erase(player_name)
+	populate_lobby_list()
 		
 func populate_deck_options():
 	'''Populates the option buttion LoadDeckOptions with decks from res://decks'''
@@ -177,23 +197,3 @@ func make_option_button_items_non_radio_checkable(option_button: OptionButton) -
 
 func _on_session_registered():
 	print("Session Registered")
-	
-
-
-func _on_peer_connected(id):
-	print("Peer connected with ID: %d" % id)
-
-func _on_peer_disconnected(id):
-	print("Peer disconnected with ID: %d" % id)
-
-func _on_connection_failed():
-	print("Connection failed")
-
-# Connect signals for peer connection events
-func _init():
-	pass
-	#get_tree().multiplayer.connect("peer_connected", self, "_on_peer_connected")
-	#get_tree().multiplayer.connect("peer_disconnected", self, "_on_peer_disconnected")
-	#get_tree().multiplayer.connect("connection_failed", self, "_on_connection_failed")
-
-# --- end code for Microsoft Copilot --- #

@@ -21,3 +21,8 @@ The current card database is stored in the ultramansim/cards and the card data i
 Since this is a fan project using a dedicated server model was deemed cost prohibitive. We opted for a peer2peer connection system with a remote server to handle NAT hole punching. Initially this will only allow for room matches by sharing codes but a match making system will be implemented in the future as well as potentially ranked. I thought it was very important that the users were not manually sharing IP addresses with each other which is why I wanted to implement a rendevouz server for this.
 
 To facilitate PVP connections I'm using the GODOT HolePuncher Plugin linked here: https://github.com/CreggHancock/HolePuncher. However, this plugin was outdated for Godot 4.3 so I copied the updates on this pull request to get it to work. https://github.com/CreggHancock/HolePuncher/pull/14.
+
+Command to run the Server.py in my Amazon Instance in the background disconnected from SSH. 
+```
+nohup python3 ./ultramantcg-sim/HolePuncher-master/Server.py 3000 > ~/output.log 2>&1 & disown
+```
