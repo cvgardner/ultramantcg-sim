@@ -19,6 +19,8 @@ var peer_udp = PacketPeerUDP.new()
 @export var port_cascade_range = 10
 #The amount of messages of the same type you will send before cascading or giving up
 @export var response_window = 5
+# Bool to set localhost when testing locally
+@export var local_testing = false 
 
 
 var found_server = false
@@ -95,7 +97,7 @@ func _process(delta):
 					var peer_port = m[3]
 					peer[peer_name] = {
 						"port": peer_port,
-						"address": peer_address
+						"address":  "127.0.0.1" if local_testing else peer_address
 					}
 					print(peer_name, " ", peer[peer_name])
 					recieved_peer_info = true

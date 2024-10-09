@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://chghecj8e3p2x"]
+[gd_scene load_steps=3 format=3 uid="uid://chghecj8e3p2x"]
 
 [ext_resource type="Script" path="res://scripts/room_creation.gd" id="1_p56v7"]
+[ext_resource type="Script" path="res://addons/Holepunch/holepunch_node.gd" id="2_3eer2"]
 
 [node name="room_creation" type="Control"]
 layout_mode = 3
@@ -10,14 +11,7 @@ offset_top = 4.0
 offset_right = 1151.0
 offset_bottom = 643.0
 script = ExtResource("1_p56v7")
-
-[node name="MainMenuButton" type="Button" parent="."]
-layout_mode = 2
-offset_left = 47.0
-offset_top = 3.0
-offset_right = 174.0
-offset_bottom = 34.0
-text = "Main Menu"
+local_testing = true
 
 [node name="LobbyContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -27,6 +21,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="LobbyContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DeckList" type="ItemList" parent="LobbyContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="HostJoinContainer" type="HBoxContainer" parent="LobbyContainer"]
 layout_mode = 2
@@ -76,3 +79,17 @@ text = "Start Game"
 [node name="CancelButton" type="Button" parent="LobbyContainer/LobbyInfoContainer/VBoxContainer"]
 layout_mode = 2
 text = "Cancel"
+
+[node name="MainMenuButton" type="Button" parent="."]
+layout_mode = 2
+offset_left = 47.0
+offset_top = 3.0
+offset_right = 174.0
+offset_bottom = 34.0
+text = "Main Menu"
+
+[node name="ConnectTimer" type="Timer" parent="."]
+
+[node name="HolePunch" type="Node" parent="."]
+script = ExtResource("2_3eer2")
+local_testing = true

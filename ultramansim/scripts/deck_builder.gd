@@ -76,8 +76,7 @@ func configure_deck_itemlist():
 	
 func load_available_cards():
 	'''Pulls in card data from the DataLoader Node'''
-	var data_loader = get_node("/root/deck_builder/DataLoader")
-	all_cards_list = data_loader.cards
+	all_cards_list = GlobalData.cards
 	available_cards = all_cards_list
 
 func update_card_list_ui():
