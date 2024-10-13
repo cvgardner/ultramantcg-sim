@@ -1,6 +1,7 @@
 extends Node
 
 var cards = {}
+var CardScene = preload("res://scenes/card.tscn")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -27,7 +28,8 @@ func load_cards_from_file(file_path):
 	var json_as_text = FileAccess.get_file_as_string(file_path_prefix + file_path)
 	var json_as_dict = JSON.parse_string(json_as_text)
 	for card in json_as_dict:
-		var new_card = Card.new(card["card_name"], card["card_no"], card["character"], card["feature"], card["level"], card["type"], card["bp"], card["abilities"], card["image_path"])
+		
+		var new_card = CardScene.instantiate().with_data(card["card_name"], card["card_no"], card["character"], card["feature"], card["level"], card["type"], card["bp"], card["abilities"], card["image_path"])
 		cards[new_card.card_no] = new_card
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

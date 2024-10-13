@@ -150,10 +150,16 @@ func _on_cancel_button_pressed():
 	else:
 		hole_puncher.checkout()
 		hole_puncher._exit_tree()
+	rpc("disconnect_server")
+	disconnect_server()
 	setup_hole_punch()
 	host_join_container.show()
 	room_code_container.hide()
 	lobby_info_container.hide()
+	
+@rpc("any_peer", "reliable")
+func disconnect_server():
+	get_tree().get_multiplayer().set_multiplayer_peer(null)
 
 func _on_start_button_pressed():
 	if ready_start_button.text == "Ready":

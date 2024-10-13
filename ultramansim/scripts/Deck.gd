@@ -6,6 +6,12 @@ var deck_size_limit = 50
 var card_limit = 4
 var deck = [] # This will be a list of card nodes
 var deckdict = {} # This is a representation of the deck as a dict of card_no:quantity
+var CardScene = preload("res://scenes/card.tscn")
+
+
+func creat_deck():
+	''' Creates the deck array of card scenes from the deckdict'''
+	var new_card = CardScene.instantiate()
 
 func _get_card_count() -> int:
 	var total_count = 0

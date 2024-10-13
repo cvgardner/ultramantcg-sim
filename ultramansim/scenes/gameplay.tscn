@@ -1,0 +1,169 @@
+[gd_scene load_steps=5 format=3 uid="uid://mvdg5c7lay7c"]
+
+[ext_resource type="Texture2D" uid="uid://dp0r2d64mkguf" path="res://images/assets/UltramanMat.png" id="1_kbc0e"]
+[ext_resource type="Texture2D" uid="uid://bymvcaq8vd6ee" path="res://images/assets/UltramanMat2.png" id="2_vy3aw"]
+[ext_resource type="Texture2D" uid="uid://pv6t32x48leg" path="res://images/assets/card_back.png" id="3_ld4pa"]
+[ext_resource type="Texture2D" uid="uid://bngo215xvukho" path="res://images/cards/BP01-012.webp" id="4_wt1vk"]
+
+[node name="gameplay" type="Control"]
+custom_minimum_size = Vector2(1152, 648)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="GameMatContainer" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(621, 648)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -310.5
+offset_top = -324.0
+offset_right = 310.5
+offset_bottom = 324.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="OpponentMat" type="TextureRect" parent="GameMatContainer"]
+layout_mode = 2
+texture = ExtResource("1_kbc0e")
+expand_mode = 5
+stretch_mode = 4
+
+[node name="PlayerMat" type="TextureRect" parent="GameMatContainer"]
+layout_mode = 2
+texture = ExtResource("2_vy3aw")
+expand_mode = 5
+stretch_mode = 4
+
+[node name="OppHandContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 1152.0
+alignment = 1
+
+[node name="PlayerHandContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+offset_top = 676.163
+offset_right = 1152.0
+offset_bottom = 676.163
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+
+[node name="PlayerDeck" type="Button" parent="."]
+layout_mode = 0
+offset_left = 781.0
+offset_top = 518.0
+offset_right = 852.0
+offset_bottom = 616.0
+icon = ExtResource("3_ld4pa")
+icon_alignment = 1
+expand_icon = true
+
+[node name="OppDeck" type="Button" parent="."]
+layout_mode = 0
+offset_left = 301.0
+offset_top = 33.0
+offset_right = 372.0
+offset_bottom = 131.0
+icon = ExtResource("3_ld4pa")
+icon_alignment = 1
+expand_icon = true
+
+[node name="OppDiscard" type="Button" parent="."]
+layout_mode = 0
+offset_left = 781.0
+offset_top = 33.0
+offset_right = 852.0
+offset_bottom = 131.0
+icon_alignment = 1
+expand_icon = true
+
+[node name="PlayerDiscard" type="Button" parent="."]
+layout_mode = 0
+offset_left = 300.0
+offset_top = 517.0
+offset_right = 371.0
+offset_bottom = 615.0
+icon_alignment = 1
+expand_icon = true
+
+[node name="SceneButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 626.0
+offset_top = 288.0
+offset_right = 697.0
+offset_bottom = 386.0
+rotation = 1.5708
+icon_alignment = 1
+expand_icon = true
+
+[node name="ActionButtonContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 893.0
+offset_top = 476.0
+offset_right = 1148.0
+offset_bottom = 640.0
+
+[node name="ActionButton" type="Button" parent="ActionButtonContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Action"
+
+[node name="CancelButton" type="Button" parent="ActionButtonContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Cancel
+"
+
+[node name="CardPreview" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 880.0
+offset_top = 2.0
+offset_right = 1156.27
+offset_bottom = 341.0
+texture = ExtResource("4_wt1vk")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="MainMenuButton" type="Button" parent="."]
+offset_left = 47.0
+offset_top = 3.0
+offset_right = 174.0
+offset_bottom = 34.0
+text = "Main Menu"
+
+[node name="BattleLog" type="TextEdit" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 212.0
+offset_right = 251.0
+offset_bottom = 564.0
+
+[node name="OppHand" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 40.0
+grow_horizontal = 2
+
+[node name="PlayerHand" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -40.0
+offset_right = 20.0
+grow_horizontal = 2
+grow_vertical = 0
