@@ -28,6 +28,7 @@ var player_deck = Deck.new()
 var all_cards_list 
 var available_cards_list
 var available_cards = []
+
 @export var local_testing = false
 
 # UI elements
@@ -57,6 +58,7 @@ func _ready():
 	join_button.pressed.connect(_on_join_button_pressed)
 	cancel_button.pressed.connect(_on_cancel_button_pressed)
 	copy_connect_button.pressed.connect(_on_copy_connect_button_pressed)
+	copy_connect_button.disabled = false
 	ready_start_button.pressed.connect(_on_start_button_pressed)
 	deck_select_button.item_selected.connect(load_deck_list_json)
 	$MainMenuButton.pressed.connect(_on_MainMenuButton_pressed)
@@ -167,7 +169,19 @@ func _on_start_button_pressed():
 		rpc("lobby_ready", player_id)
 		deck_select_button.disabled = true
 	elif ready_start_button.text == "Start":
-		pass
+		rpc("load_game_scene")
+		load_game_scene()
+
+@rpc("any_peer", "reliable")
+func load_game_scene():
+	GlobalData.player_deck = player_deck
+	rpc("send_deck", player_deck.deckdict)
+	get_tree().change_scene_to_file("res://scenes/gameplay.tscn")
+
+
+@rpc("any_peer", "reliable")
+func send_deck(sent_deck):
+	GlobalData.opp_deck.deckdict = sent_deck
 
 @rpc("any_peer", "reliable")
 func lobby_ready(player_id):
@@ -215,6 +229,7 @@ func _on_HolePunch_hole_punched(my_port, hosts_port, hosts_address):
 		
 func _on_connect_time_timeout():
 	print("Connection Timer Timeout")
+	copy_connect_button.disabled = true
 	
 	get_tree().get_multiplayer().peer_connected.connect(_on_peer_connected)
 	get_tree().get_multiplayer().peer_disconnected.connect(_on_peer_disconnected)

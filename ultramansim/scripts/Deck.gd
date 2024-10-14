@@ -9,9 +9,19 @@ var deckdict = {} # This is a representation of the deck as a dict of card_no:qu
 var CardScene = preload("res://scenes/card.tscn")
 
 
-func creat_deck():
+func create_deck():
 	''' Creates the deck array of card scenes from the deckdict'''
-	var new_card = CardScene.instantiate()
+	for key in deckdict.keys():
+		for i in range(deckdict[key]):
+			var new_card = CardScene.instantiate().with_data(deckdict[key]["card_name"], deckdict[key]["card_no"], deckdict[key]["character"], deckdict[key]["feature"], deckdict[key]["level"], deckdict[key]["type"], deckdict[key]["bp"], deckdict[key]["abilities"], deckdict[key]["image_path"])
+			deck.append(new_card)
+			pass
+	
+func shuffe_deck():
+	'''Randomizes the array self.deck using built_in shuffle.'''
+	deck.shuffle()
+
+	
 
 func _get_card_count() -> int:
 	var total_count = 0

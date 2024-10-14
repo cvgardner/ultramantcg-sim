@@ -1,5 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://mvdg5c7lay7c"]
+[gd_scene load_steps=6 format=3 uid="uid://mvdg5c7lay7c"]
 
+[ext_resource type="Script" path="res://scripts/gameplay.gd" id="1_fwix1"]
 [ext_resource type="Texture2D" uid="uid://dp0r2d64mkguf" path="res://images/assets/UltramanMat.png" id="1_kbc0e"]
 [ext_resource type="Texture2D" uid="uid://bymvcaq8vd6ee" path="res://images/assets/UltramanMat2.png" id="2_vy3aw"]
 [ext_resource type="Texture2D" uid="uid://pv6t32x48leg" path="res://images/assets/card_back.png" id="3_ld4pa"]
@@ -11,6 +12,7 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+script = ExtResource("1_fwix1")
 
 [node name="GameMatContainer" type="VBoxContainer" parent="."]
 custom_minimum_size = Vector2(621, 648)

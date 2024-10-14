@@ -2,7 +2,8 @@ extends Node
 
 var cards = {}
 var CardScene = preload("res://scenes/card.tscn")
-
+var player_deck = Deck.new()
+var opp_deck = Deck.new()
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	load_from_directory()

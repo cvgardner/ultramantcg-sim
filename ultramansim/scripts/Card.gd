@@ -100,11 +100,15 @@ func with_data( card_name:= "Ultraman Dyna, Flash Type",
 	return self
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	print_tree()
+	$Level.set_text(str(self.level))
+	_update_power_text(self.bp['single'])
 	pass # Replace with function body.
 
 func _update_power_text(power: int):
 	var formatted_string = "[center]" + str(power/1000) + ",000" + "[/center]"
 	$TextEdit.set_text(formatted_string)
+
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
