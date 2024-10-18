@@ -4,6 +4,13 @@ var cards = {}
 var CardScene = preload("res://scenes/card.tscn")
 var player_deck = Deck.new()
 var opp_deck = Deck.new()
+var player_id : String
+var opp_id : String
+var player_hand = []
+var opp_hand = []
+var player_discard = []
+var opp_discard = []
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	load_from_directory()

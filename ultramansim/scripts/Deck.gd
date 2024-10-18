@@ -4,7 +4,7 @@ class_name Deck
 
 var deck_size_limit = 50
 var card_limit = 4
-var deck = [] # This will be a list of card nodes
+var deck = [] # This will be a list of card nodes/ card_no strings (unsure atm)
 var deckdict = {} # This is a representation of the deck as a dict of card_no:quantity
 var CardScene = preload("res://scenes/card.tscn")
 
@@ -13,11 +13,26 @@ func create_deck():
 	''' Creates the deck array of card scenes from the deckdict'''
 	for key in deckdict.keys():
 		for i in range(deckdict[key]):
-			var new_card = CardScene.instantiate().with_data(deckdict[key]["card_name"], deckdict[key]["card_no"], deckdict[key]["character"], deckdict[key]["feature"], deckdict[key]["level"], deckdict[key]["type"], deckdict[key]["bp"], deckdict[key]["abilities"], deckdict[key]["image_path"])
-			deck.append(new_card)
+			
+			# Initially wanted to use nodes for the deck but just realized its only necessary to instantiate when viewing in the UI
+			# Keeping this code incase I want to revert back to a deck of nodes
+			#var new_card = CardScene.instantiate().with_data(GlobalData.cards[key].card_name, GlobalData.cards[key].card_no, GlobalData.cards[key].character, GlobalData.cards[key].feature, GlobalData.cards[key].level, GlobalData.cards[key].type, GlobalData.cards[key].bp, GlobalData.cards[key].abilities, GlobalData.cards[key].image_path)
+			deck.append(key)
 			pass
+			
+func draw_card(x):
+	'''Pops the first x elements from the deck and returns them in an array'''
+	var results = []
+	if deck.size() >= x:
+		for card in range(x):
+			results.append(deck.pop_front())
+	else:
+		print("deck is empty")
+	return results	
+		
 	
-func shuffe_deck():
+	
+func shuffle_deck():
 	'''Randomizes the array self.deck using built_in shuffle.'''
 	deck.shuffle()
 

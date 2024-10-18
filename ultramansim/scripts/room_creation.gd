@@ -144,6 +144,8 @@ func _on_copy_connect_button_pressed():
 			return
 		print(player_id)
 		hole_puncher.start_traversal(input_code, role, player_id)
+	if copy_connect_button.text == "Connect":
+		copy_connect_button.disabled = true
 	
 func _on_cancel_button_pressed():
 	if hole_puncher.is_host:
@@ -164,7 +166,7 @@ func disconnect_server():
 	get_tree().get_multiplayer().set_multiplayer_peer(null)
 
 func _on_start_button_pressed():
-	if ready_start_button.text == "Ready":
+	if ready_start_button.text == "Ready" and player_deck.deckdict != {}:
 		lobby_ready(player_id)
 		rpc("lobby_ready", player_id)
 		deck_select_button.disabled = true
@@ -174,10 +176,15 @@ func _on_start_button_pressed():
 
 @rpc("any_peer", "reliable")
 func load_game_scene():
+	GlobalData.player_id = player_id
+	rpc("send_player_id", player_id)
 	GlobalData.player_deck = player_deck
 	rpc("send_deck", player_deck.deckdict)
 	get_tree().change_scene_to_file("res://scenes/gameplay.tscn")
 
+@rpc("any_peer", "reliable")
+func send_player_id(id):
+	GlobalData.opp_id = id
 
 @rpc("any_peer", "reliable")
 func send_deck(sent_deck):
