@@ -13,6 +13,13 @@ var abilities: Array
 var image: Texture
 var image_path: String
 
+# Gameplay Variables
+var curr_stack : String
+var curr_power : int
+var curr_type : String
+
+signal card_hovered(card_no)
+
 func _init( card_name:= "Ultraman Dyna, Flash Type",
  card_no:= "SD01-001",
  character:= "DYNA",
@@ -107,6 +114,7 @@ func with_data( card_name:= "Ultraman Dyna, Flash Type",
 func _ready() -> void:
 	$Level.set_text(str(self.level))
 	_update_power_text(self.bp['single'])
+	self.mouse_entered.connect(_on_mouse_entered)
 	pass # Replace with function body.
 
 func _update_power_text(power: int):
@@ -139,6 +147,27 @@ func card_back(card_name:= "Ultraman Dyna, Flash Type",
 	$Level.hide()
 	return self
 	
+func hide_power():
+	$Power.hide()
+	
+func show_power():
+	$Power.show()
+	
+func hide_level():
+	$Level.hide()
+
+func show_level():
+	$Level.show()
+	
+func _on_mouse_entered():
+	print("mouse_entered card node ", self.card_no)
+	emit_signal("card_hovered", self.card_no)
+	
+func _on_mouse_exited():
+	pass
+	
+func _on_gui_ui_input(event: InputEvent) -> void:
+	pass
 	
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.

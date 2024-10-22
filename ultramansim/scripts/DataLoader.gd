@@ -32,7 +32,7 @@ func load_from_directory():
 func load_cards_from_file(file_path):
 	'''Loads all the card data from the specified json file. 
 	Updates the "cards" property to be an array of all the cards loaded.'''
-	var file_path_prefix = "res://Scripts/card_data/"
+	var file_path_prefix = "res://scripts/card_data/"
 	var json_as_text = FileAccess.get_file_as_string(file_path_prefix + file_path)
 	var json_as_dict = JSON.parse_string(json_as_text)
 	for card in json_as_dict:

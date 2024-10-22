@@ -28,7 +28,11 @@ func draw_card(x):
 			results.append(deck.pop_front())
 	else:
 		print("deck is empty")
-	return results	
+	return results
+	
+func bottom_cards(card_array):
+	''' Puts the array of cards inputted to the bottom of the deck'''
+	deck = deck + card_array
 		
 	
 	
