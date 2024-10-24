@@ -11,6 +11,7 @@
 			"double": 13000,
 			"triple": 16000
 		},
+		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <SPEED> or <ARMED>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
@@ -36,6 +37,7 @@
 			"double": 13000,
 			"triple": 16000
 		},
+		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <BASIC> or <ARMED>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
@@ -61,6 +63,7 @@
 			"double": 11000,
 			"triple": 17000
 		},
+		"ability_text": "[Single][Double][When this character enters play] You may give one of your DOUBLE <GEED> a BP grade increase by 1 for this turn.",
 		"abilities": [
 			{
 				"trigger": "ENTERS_PLAY",
@@ -84,6 +87,7 @@
 		"bp": {
 			"single": 5000
 		},
+		"ability_text": "",
 		"abilities": [
 		],
 		"image_path": "res://images/cards/SD02/SD02-004.webp"
@@ -100,6 +104,7 @@
 			"double": 10000,
 			"triple": 14000
 		},
+		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <SPEED>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
@@ -124,6 +129,7 @@
 			"single": 7000,
 			"double": 11000
 		},
+		"ability_text": "",
 		"abilities": [
 		],
 		"image_path": "res://images/cards/SD02/SD02-006.webp"
@@ -138,6 +144,7 @@
 		"bp": {
 			"single": 5000
 		},
+		"ability_text": "",
 		"abilities": [
 		],
 		"image_path": "res://images/cards/SD02/SD02-007.webp"
@@ -154,6 +161,7 @@
 			"double": 10000,
 			"triple": 14000
 		},
+		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <ARMED>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
@@ -178,6 +186,7 @@
 			"single": 5000,
 			"double": 11000
 		},
+		"ability_text": "",
 		"abilities": [
 		],
 		"image_path": "res://images/cards/SD02/SD02-009.webp"
@@ -192,6 +201,7 @@
 		"bp": {
 			"single": 5000
 		},
+		"ability_text": "",
 		"abilities": [
 		],
 		"image_path": "res://images/cards/SD02/SD02-010.webp"
@@ -208,6 +218,7 @@
 			"double": 10000,
 			"triple": 14000
 		},
+		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <ARMED>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
@@ -233,6 +244,7 @@
 			"double": 16000,
 			"extra": 8000
 		},
+		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <BASIC>, this character's BP grade becomes EXTRA.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
@@ -257,6 +269,7 @@
 			"single": 9000,
 			"double": 15000
 		},
+		"ability_text": "[Single][When this character enters play] You may send one opponent's scene with round 1 to their discard area.",
 		"abilities": [
 			{
 				"trigger": "ENTER_PLAY",
@@ -279,6 +292,7 @@
 		"bp": {
 
 		},
+		"ability_text": "[Activate][Once per turn][No Cost] Give the battle opponent of one of your <ZERO>, <GEED>, <Z> TYPE ARMED for this turn.",
 		"abilities": [
 			{
 				"trigger": "ACTIVATE",

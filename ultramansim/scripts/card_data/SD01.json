@@ -11,6 +11,7 @@
 			"double": 11000,
 			"triple": 16000
 		},
+		"ability_text": "[Double][Triple][When this character enters play] You may reveal the top three cards of your deck, to put one [Ultraman Tiga, Ultraman Dyna & Ultraman Gaia: The Battle in Hyper Space]. <TIGA>, or <GAIA> card from among them into your hand, and send the rest to your discard area",
 		"abilities": [
 			{
 				"trigger": "ENTER_PLAY",
@@ -38,6 +39,7 @@
 			"double": 12000,
 			"triple": 17000
 		},
+		"ability_text": "[Triple][Activate][Once Per Turn][Discard one card from your hand] Give this character's battle opponent a BP grade decrease by 1 for this turn.",
 		"abilities": [
 			{
 				"trigger": "ACTIVATE",
@@ -65,6 +67,7 @@
 			"double": 11000,
 			"triple": 16000
 		},
+		"ability_text": "[Double][Triple][When this character enters play] You may reveal the top three cards of your deck, to put one [Ultraman Tiga, Ultraman Dyna & Ultraman Gaia: The Battle in Hyper Space]. <TIGA>, or <DYNA> card from among them into your hand, and send the rest to your discard area",
 		"abilities": [
 			{
 				"trigger": "ENTER_PLAY",
@@ -90,6 +93,7 @@
 		"bp": {
 			"single": 5000
 		},
+		"ability_text": "",
 		"abilities": [
 		],
 		"image_path": "res://images/cards/SD01/SD01-004.webp"
@@ -106,6 +110,7 @@
 			"double": 10000,
 			"triple": 14000
 		},
+		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <POWER>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
@@ -130,6 +135,7 @@
 			"single": 8000,
 			"double": 10000
 		},
+		"ability_text": "",
 		"abilities": [
 		],
 		"image_path": "res://images/cards/SD01/SD01-006.webp"
@@ -144,6 +150,7 @@
 		"bp": {
 			"single": 5000
 		},
+		"ability_text": "",
 		"abilities": [
 		],
 		"image_path": "res://images/cards/SD01/SD01-007.webp"
@@ -160,6 +167,7 @@
 			"double": 10000,
 			"triple": 14000
 		},
+		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <ARMED>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
@@ -184,6 +192,7 @@
 			"single": 8000,
 			"double": 10000
 		},
+		"ability_text": "",
 		"abilities": [
 		],
 		"image_path": "res://images/cards/SD01/SD01-009.webp"
@@ -198,6 +207,7 @@
 		"bp": {
 			"single": 5000
 		},
+		"ability_text": "",
 		"abilities": [
 		],
 		"image_path": "res://images/cards/SD01/SD01-010.webp"
@@ -214,6 +224,7 @@
 			"double": 11000,
 			"triple": 13000
 		},
+		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <SPEED>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
@@ -239,6 +250,7 @@
 			"double": 16000,
 			"extra": 8000
 		},
+		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <BASIC>, this character's BP becomes EXTRA.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
@@ -263,6 +275,7 @@
 			"single": 9000,
 			"double": 15000
 		},
+		"ability_text": "[Single][When this character enters play] You may send on opponent's scene with round 0 to their discard area.",
 		"abilities": [
 			{
 				"trigger": "ENTER_PLAY",
@@ -285,6 +298,7 @@
 		"bp": {
 
 		},
+		"ability_text": "[Activate][Once Per Turn][No Cost] Give one of your <TIGA>, <DYNA>, or <GAIA> +1000 BP for this turn.",
 		"abilities": [
 			{
 				"trigger": "ACTIVATE",
