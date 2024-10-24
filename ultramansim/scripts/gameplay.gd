@@ -8,10 +8,10 @@ var is_lead : bool # Boolean signifying if the server is lead or not
 var battle_log_text = "" # String battle log text
 enum Phase { SETUP, START, DRAW, LEAD_SCENE_SET, SET_CHARACTER, LEVEL_UP, OPEN, EFFECT_ACTIVATION, JUDGEMENT, END}
 var current_phase 
-var round = 0
+var current_round = 0
 var server_mulligan_complete = false
 var client_mulligan_complete = false
-var current_scene : String # The currently active scene's card_no
+var current_scene  # The currently active scene's card_no
 var player_field = [] # Player field specified as an array of array of nodes
 var opp_field = [] # Opponent field specified as an array of array of nodes
 
@@ -35,6 +35,8 @@ func _ready() -> void:
 	phase_changed.connect(_on_phase_changed)
 	hand_changed.connect(_hand_changed_emitted)
 	start_mulligan.connect(do_mulligan)
+	$SceneButton.button_hovered.connect(_preview_card)
+	
 	#Hide some UI components
 	action_buttons_hide()
 	configure_hand_ui()
@@ -66,15 +68,23 @@ func _on_phase_changed(new_phase: Phase):
 				update_battle_log("Setting up Game")
 				game_setup()
 			Phase.START:
-				var s = "Round {0} Start!".format([round])
+				var s = "Round {0} Start!".format([current_round])
 				update_battle_log(s)
 				start_phase()
 			Phase.DRAW:
-				var s = "Round {0} Draw Phase".format([round])
+				var s = "Round {0} Draw Phase".format([current_round])
 				draw_phase()
 			Phase.LEAD_SCENE_SET:
+				var s = "Lead Player Setting Scene"
+				update_battle_log(s)
+				if is_lead:
+					set_scene_phase("init")
+				else:
+					rpc("set_scene_phase", "init")
 				pass
 			Phase.SET_CHARACTER:
+				var s = "Lead Player Setting Character"
+				update_battle_log(s)
 				pass
 			Phase.LEVEL_UP:
 				pass
@@ -85,6 +95,7 @@ func _on_phase_changed(new_phase: Phase):
 			Phase.JUDGEMENT:
 				pass
 			Phase.END:
+				current_round += 1
 				pass
 	
 func start_phase():
@@ -108,6 +119,39 @@ func draw_phase():
 	emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
 	
 	set_phase(Phase.LEAD_SCENE_SET)
+	
+@rpc("any_peer", "reliable")
+func set_scene_phase(input):
+	if str(input) == "init":
+		action_button.text = "Set Scene"
+		cancel_button.text = "Cancel"
+		action_buttons_show()
+	elif is_lead:
+		var selected_card_no = GlobalData.player_hand[int(input)]
+		current_scene = GlobalData.cards[selected_card_no]._make_copy()
+		set_scene_ui(selected_card_no)
+		rpc("set_scene_ui", selected_card_no)
+		GlobalData.player_hand.pop_at(input)
+		emit_signal("hand_changed", "player", GlobalData.player_hand)
+
+		
+	elif not is_lead:
+		var selected_card_no = GlobalData.opp_hand[int(input)]
+		current_scene = GlobalData.cards[selected_card_no]._make_copy()
+		set_scene_ui(selected_card_no)
+		rpc("set_scene_ui", selected_card_no)
+		GlobalData.opp_hand.pop_at(input)
+		emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
+		
+		
+	if str(input) != "init":
+		action_buttons_hide()
+		set_phase(Phase.SET_CHARACTER)
+		
+		
+@rpc("any_peer", "reliable")
+func set_scene_ui(selected_card_no):
+	$SceneButton.set_button_icon(GlobalData.cards[selected_card_no].image)
 	
 func game_setup():	
 	if multiplayer.is_server():
@@ -195,7 +239,7 @@ func mulligan(step):
 		print("Mulligan Init")
 		# Mulligan
 		action_button.text = "Mulligan"
-		cancel_button.text = "Cancel"
+		cancel_button.text = "No Mulligan"
 		action_buttons_show()
 		
 	elif step == "server":
@@ -265,6 +309,15 @@ func _action_button_pressed():
 		else:
 			update_battle_log("{0} has chosen to mulligan".format([GlobalData.player_id]))
 			rpc_id(1, "mulligan", "client")
+	
+	elif action_button.text == "Set Scene":
+		var selected_item_index = $PlayerHand.get_selected_items()[0]
+		var selected_card = GlobalData.cards[$PlayerHand.get_item_metadata(selected_item_index)]
+		if multiplayer.is_server() and selected_card.feature == "Scene" and selected_card.level == current_round:
+			set_scene_phase(selected_item_index)
+		elif selected_card.feature == "Scene" and selected_card.level == current_round:
+			rpc("set_scene_phase", selected_item_index)
+			
 			
 	
 
@@ -282,12 +335,19 @@ func _cancel_button_pressed():
 			rpc_id(1, "set_lead_player", true)
 			update_battle_log("{0} has chosen to be Next Player".format([GlobalData.player_id]))
 	
-	elif cancel_button.text == "Cancel":
+	elif cancel_button.text == "No Mulligan":
 		action_buttons_hide()
 		if multiplayer.is_server():
 			mulligan("server_pass")
 		else:
 			rpc_id(1, "mulligan", "client_pass")
+	
+	elif cancel_button.text == "Cancel" and Phase.LEAD_SCENE_SET:
+		action_buttons_hide()
+		if multiplayer.is_server():
+			set_phase(Phase.SET_CHARACTER)
+		else: 
+			rpc("set_phase", Phase.SET_CHARACTER)
 	
 @rpc("any_peer", "reliable")
 func set_lead_player(boolean):
@@ -346,7 +406,10 @@ func _clear_hbox_container(hbox):
 		child.queue_free()
 
 func _preview_card(item):
-	if item != 'none':
+	if item == "scene_entered":
+		card_preview.set_visible(true)
+		card_preview.set_texture($SceneButton.icon)
+	elif item != 'none':
 		card_preview.set_visible(true)
 		card_preview.set_texture(GlobalData.cards[item].image)
 		
@@ -360,8 +423,8 @@ func configure_local_test():
 	var IP_ADDRESS = "127.0.0.1"
 	var PORT = 54321
 	if is_server:
-		GlobalData.player_deck.deckdict = {"SD01-001":1,"SD01-002":1,"SD01-003":1,"SD01-004":4,"SD01-006":1,"SD01-007":2,"SD01-008":3,"SD01-009":1,"SD01-010":2}
-		GlobalData.opp_deck.deckdict = {"SD01-001":1,"SD01-002":1,"SD01-003":1,"SD01-004":4,"SD01-006":1,"SD01-007":2,"SD01-008":3,"SD01-009":1,"SD01-010":2}
+		GlobalData.player_deck.deckdict = {"SD01-001":1,"SD01-002":1,"SD01-003":1,"SD01-004":4,"SD01-006":1,"SD01-007":2,"SD01-008":3,"SD01-009":1,"SD01-010":2, "SD02-014": 4}
+		GlobalData.opp_deck.deckdict = {"SD01-001":1,"SD01-002":1,"SD01-003":1,"SD01-004":4,"SD01-006":1,"SD01-007":2,"SD01-008":3,"SD01-009":1,"SD01-010":2, "SD02-014": 4}
 		GlobalData.player_id = "Server"
 		GlobalData.opp_id = "Client"
 		var peer = ENetMultiplayerPeer.new()
