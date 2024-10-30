@@ -18,7 +18,7 @@ func _ready() -> void:
 	
 	
 func load_from_directory():
-	var dir = DirAccess.open('res://Scripts/card_data')
+	var dir = DirAccess.open('res://scripts/card_data')
 	if dir:
 		dir.list_dir_begin()
 		var file_name = dir.get_next()
