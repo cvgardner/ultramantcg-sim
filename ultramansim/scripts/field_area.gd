@@ -15,6 +15,7 @@ func set_character(item):
 	var new_card = GlobalData.cards[item]._make_copy()
 	new_card.flip_face_down()
 	data.append([new_card])
+	visualize()
 	
 func level_up(index,item):
 	'''
@@ -26,6 +27,7 @@ func level_up(index,item):
 	var new_card = GlobalData.cards[item]._make_copy()
 	new_card.flip_face_down()
 	data[index] = [new_card] + data[index]
+	visualize()
 
 func visualize():
 	'''

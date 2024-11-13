@@ -113,7 +113,8 @@ func with_data( card_name:= "Ultraman Dyna, Flash Type",
 	return self
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	$Level.set_text(str(self.level))
+	$Level.texture = ResourceLoader.load("res://images/assets/level_{0}.png".format(str(level)))
+	$Stack.texture = ResourceLoader.load("res://images/assets/single.png")
 	_update_power_text(self.bp['single'])
 	self.mouse_entered.connect(_on_mouse_entered)
 	pass # Replace with function body.
@@ -170,6 +171,21 @@ func hide_level():
 
 func show_level():
 	$Level.show()
+
+func show_stack():
+	$Stack.show()
+
+func hide_stack():
+	$Stack.hide()
+	
+func change_stack(new_stack):
+	'''
+	changes the curr_stack variable and then stack icon
+	input should be either "SINGLE", "DOUBLE" or "TRIPLE"
+	'''
+	curr_stack = new_stack
+	$Stack.texture = ResourceLoader.load("res://images/assets/{0}.png".format([curr_stack]))
+
 	
 func _on_mouse_entered():
 	print("mouse_entered card node ", self.card_no)
