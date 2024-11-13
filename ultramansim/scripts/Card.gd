@@ -17,6 +17,7 @@ var image_path: String
 var curr_stack : String
 var curr_power : int
 var curr_type : String
+var image_path_card_back = "res://images/assets/card_back.png"
 
 signal card_hovered(card_no)
 
@@ -120,6 +121,18 @@ func _ready() -> void:
 func _update_power_text(power: int):
 	var formatted_string = "[center]" + str(power/1000) + ",000" + "[/center]"
 	$Power.set_text(formatted_string)
+	
+func flip_face_down():
+	'''
+	Flips this card facedown aka change image to cardback
+	'''
+	self.image = ResourceLoader.load(image_path_card_back)
+	
+func flip_face_up():
+	'''
+	Flips this card face up aka change image to card image
+	'''
+	self.image = ResourceLoader.load(self.image_path)
 
 func card_back(card_name:= "Ultraman Dyna, Flash Type",
 	 card_no:= "SD01-001",
@@ -140,8 +153,7 @@ func card_back(card_name:= "Ultraman Dyna, Flash Type",
 	self.type = type
 	self.bp = bp
 	self.abilities = abilities
-	image_path = "res://images/assets/card_back.png"
-	self.image = ResourceLoader.load(image_path)
+	self.image = ResourceLoader.load(image_path_card_back)
 	self.image_path = image_path
 	$Power.hide()
 	$Level.hide()

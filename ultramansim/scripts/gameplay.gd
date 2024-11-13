@@ -440,6 +440,10 @@ func configure_local_test():
 		get_tree().get_multiplayer().set_multiplayer_peer(peer)
 		print("Setup client", multiplayer.is_server())
 
+func update_stack():
+	'''Function to update the Single/Double/Triple values of curr_stack and update the associated icon'''
+	#TODO
+	pass
 		
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

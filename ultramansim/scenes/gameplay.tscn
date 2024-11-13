@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://mvdg5c7lay7c"]
+[gd_scene load_steps=9 format=3 uid="uid://mvdg5c7lay7c"]
 
 [ext_resource type="Script" path="res://scripts/gameplay.gd" id="1_fwix1"]
 [ext_resource type="Texture2D" uid="uid://beqkbj70sj4tq" path="res://images/assets/UltramanMat.png" id="1_kbc0e"]
@@ -7,13 +7,16 @@
 [ext_resource type="Texture2D" uid="uid://bngo215xvukho" path="res://images/cards/BP01-012.webp" id="4_wt1vk"]
 [ext_resource type="Script" path="res://scenes/custom_scene_button.gd" id="5_jiqh6"]
 [ext_resource type="Script" path="res://scripts/CustomItemList.gd" id="6_g88w0"]
+[ext_resource type="Script" path="res://scenes/field_area.gd" id="8_42txr"]
 
 [node name="gameplay" type="Control"]
 custom_minimum_size = Vector2(1152, 648)
 layout_mode = 3
 anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 1151.0
+offset_top = 938.0
+offset_right = 2303.0
+offset_bottom = 1586.0
 script = ExtResource("1_fwix1")
 local_test = true
 
@@ -191,3 +194,18 @@ offset_left = 840.0
 offset_top = 329.0
 offset_right = 881.0
 offset_bottom = 369.0
+
+[node name="PlayerField" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 274.0
+offset_top = 372.0
+offset_right = 876.0
+offset_bottom = 504.0
+script = ExtResource("8_42txr")
+
+[node name="OppField" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 272.0
+offset_top = 141.0
+offset_right = 874.0
+offset_bottom = 273.0
