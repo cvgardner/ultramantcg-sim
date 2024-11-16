@@ -12,11 +12,11 @@
 [node name="gameplay" type="Control"]
 custom_minimum_size = Vector2(1152, 648)
 layout_mode = 3
-anchors_preset = 0
-offset_left = 1151.0
-offset_top = 938.0
-offset_right = 2303.0
-offset_bottom = 1586.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_fwix1")
 local_test = true
 
@@ -197,16 +197,16 @@ offset_bottom = 369.0
 
 [node name="PlayerField" type="HBoxContainer" parent="."]
 layout_mode = 0
-offset_left = 274.0
+offset_left = 300.0
 offset_top = 372.0
-offset_right = 876.0
+offset_right = 850.0
 offset_bottom = 504.0
 script = ExtResource("8_42txr")
 
 [node name="OppField" type="HBoxContainer" parent="."]
 layout_mode = 0
-offset_left = 272.0
+offset_left = 300.0
 offset_top = 141.0
-offset_right = 874.0
+offset_right = 850.0
 offset_bottom = 273.0
 script = ExtResource("8_42txr")

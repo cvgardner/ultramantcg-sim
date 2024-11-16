@@ -13,7 +13,9 @@ var server_mulligan_complete = false
 var client_mulligan_complete = false
 var current_scene  # The currently active scene's card_no
 var player_field = [] # Player field specified as an array of array of nodes
+var player_field_vis = [] # Which cards are face up and face down on the player field
 var opp_field = [] # Opponent field specified as an array of array of nodes
+var opp_field_vis = [] # Boolean Array representing which card are face up and face down.
 
 var CardScene = preload("res://scenes/card.tscn")
 @export var local_test: bool = false
@@ -22,6 +24,7 @@ var CardScene = preload("res://scenes/card.tscn")
 signal phase_changed(new_phase: Phase)
 signal lead_player_chosen()
 signal hand_changed(player, hand)
+signal field_changed(player, field, field_vis)
 signal start_mulligan
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -34,6 +37,7 @@ func _ready() -> void:
 	cancel_button.pressed.connect(_cancel_button_pressed)
 	phase_changed.connect(_on_phase_changed)
 	hand_changed.connect(_hand_changed_emitted)
+	field_changed.connect(_field_changed_emitted)
 	start_mulligan.connect(do_mulligan)
 	$SceneButton.button_hovered.connect(_preview_card)
 	
@@ -53,7 +57,7 @@ func _ready() -> void:
 	
 
 
-	
+@rpc("any_peer","reliable")
 func set_phase(phase: Phase):
 	if multiplayer.is_server():
 		current_phase = phase
@@ -83,12 +87,21 @@ func _on_phase_changed(new_phase: Phase):
 					rpc("set_scene_phase", "init")
 				pass
 			Phase.SET_CHARACTER:
-				var s = "Lead Player Setting Character"
+				var s = "SET CHARACTER PHASE"
 				update_battle_log(s)
+				if is_lead:
+					set_character_phase("init", "server")
+				else:
+					rpc("set_character_phase", "init", "client")
 				pass
 			Phase.LEVEL_UP:
+				var s = "LEVEL UP PHASE"
+				update_battle_log(s)
+				set_phase(Phase.OPEN)
 				pass
 			Phase.OPEN:
+				open_phase()
+				rpc("open_phase")
 				pass
 			Phase.EFFECT_ACTIVATION:
 				pass
@@ -128,16 +141,12 @@ func set_scene_phase(input):
 		action_buttons_show()
 	elif is_lead:
 		var selected_card_no = GlobalData.player_hand[int(input)]
-		current_scene = GlobalData.cards[selected_card_no]._make_copy()
 		set_scene_ui(selected_card_no)
 		rpc("set_scene_ui", selected_card_no)
 		GlobalData.player_hand.pop_at(input)
 		emit_signal("hand_changed", "player", GlobalData.player_hand)
-
-		
 	elif not is_lead:
 		var selected_card_no = GlobalData.opp_hand[int(input)]
-		current_scene = GlobalData.cards[selected_card_no]._make_copy()
 		set_scene_ui(selected_card_no)
 		rpc("set_scene_ui", selected_card_no)
 		GlobalData.opp_hand.pop_at(input)
@@ -147,11 +156,58 @@ func set_scene_phase(input):
 	if str(input) != "init":
 		action_buttons_hide()
 		set_phase(Phase.SET_CHARACTER)
+		rpc("set_phase", Phase.SET_CHARACTER)
 		
 		
 @rpc("any_peer", "reliable")
 func set_scene_ui(selected_card_no):
 	$SceneButton.set_button_icon(GlobalData.cards[selected_card_no].image)
+	
+@rpc("any_peer", "reliable")
+func set_character_phase(input, caller):	
+	'''Performs Set Character and visual update actions'''
+	
+	if str(input) == "init":
+		action_button.text = "Set Character"
+		cancel_button.text = "Forfeit"
+		action_buttons_show()
+	
+	if str(input) != "init": #Input is the index from hand of the selected card
+		if caller == "server":
+			var selected_card_no = GlobalData.player_hand[int(input)]
+			player_field.append([selected_card_no])
+			player_field_vis.append(false)
+			GlobalData.player_hand.pop_at(input)
+			print(player_field, opp_field)
+			emit_signal("hand_changed", "player", GlobalData.player_hand)
+			emit_signal("field_changed", "player", player_field, player_field_vis)
+			action_buttons_hide()
+			rpc("set_character_phase", "init", "client")
+			
+		elif caller == "client":
+			var selected_card_no = GlobalData.opp_hand[int(input)]
+			opp_field.append([selected_card_no])
+			opp_field_vis.append(false)
+			GlobalData.opp_hand.pop_at(input)
+			emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
+			emit_signal("field_changed", "opponent", opp_field, opp_field_vis)
+			action_buttons_hide()
+			set_character_phase("init", "server")
+
+	
+	if len(player_field) == current_round + 1 and len(player_field) == len(opp_field):
+		action_buttons_hide()
+		if multiplayer.is_server():
+			set_phase(Phase.LEVEL_UP)	
+		else:
+			rpc("set_phase", Phase.LEVEL_UP)
+		return
+		
+	
+@rpc("any_peer", "reliable")
+func open_phase():
+	$PlayerField.flip_all_face_up()
+	$OppField.flip_all_face_up()
 	
 func game_setup():	
 	if multiplayer.is_server():
@@ -208,11 +264,19 @@ func _hand_changed_emitted(player, hand):
 	if player == "opponent":
 		update_hand(player, hand)
 		rpc("update_hand", "player", hand)
+	
+func _field_changed_emitted(player, field, field_vis):
+	'''Process RPC for field updates'''
+	if player == "player":
+		update_field(player, field, field_vis)
+		rpc("update_field", "opponent", field, field_vis)
+	if player == "opponent":
+		update_field(player, field, field_vis)
+		rpc("update_field", "player", field, field_vis)
 
 @rpc("any_peer", "reliable")
 func update_hand(player, hand):
 	'''Updates the hand UI based on the hand which is an array of card_no and player'''
-	print(multiplayer.is_server(), player, hand)
 	if player == "player":
 		$PlayerHand.clear()
 		var index = 0
@@ -230,6 +294,13 @@ func update_hand(player, hand):
 			$OppHand.set_item_metadata(index, card)
 			index += 1
 		$OppHand.queue_redraw()
+
+@rpc("any_peer", "reliable")
+func update_field(player, field, field_vis):
+	if player == "player":
+		$PlayerField.visualize(field, field_vis)
+	else: #If player is opponent
+		$OppField.visualize(field, field_vis)
 	
 
 @rpc("any_peer", "reliable")
@@ -311,13 +382,25 @@ func _action_button_pressed():
 			rpc_id(1, "mulligan", "client")
 	
 	elif action_button.text == "Set Scene":
-		var selected_item_index = $PlayerHand.get_selected_items()[0]
-		var selected_card = GlobalData.cards[$PlayerHand.get_item_metadata(selected_item_index)]
-		if multiplayer.is_server() and selected_card.feature == "Scene" and selected_card.level == current_round:
-			set_scene_phase(selected_item_index)
-		elif selected_card.feature == "Scene" and selected_card.level == current_round:
-			rpc("set_scene_phase", selected_item_index)
+		if len($PlayerHand.get_selected_items()) > 0:
+
+			var selected_item_index = $PlayerHand.get_selected_items()[0]
+			var selected_card = GlobalData.cards[$PlayerHand.get_item_metadata(selected_item_index)]
+			if multiplayer.is_server() and selected_card.feature == "Scene" and selected_card.level == current_round:
+				set_scene_phase(selected_item_index)
+			elif selected_card.feature == "Scene" and selected_card.level == current_round:
+				rpc("set_scene_phase", selected_item_index)
 			
+	elif action_button.text == "Set Character":
+		action_buttons_hide()
+		if len($PlayerHand.get_selected_items()) > 0:
+			var selected_item_index = $PlayerHand.get_selected_items()[0]
+			var selected_card = GlobalData.cards[$PlayerHand.get_item_metadata(selected_item_index)]
+			if selected_card.feature in ['Ultra Hero', 'Ultra Kaiju']:
+				if multiplayer.is_server():
+					set_character_phase(selected_item_index, "server")
+				else:		
+					rpc("set_character_phase", selected_item_index, "client")
 			
 	
 
@@ -348,6 +431,10 @@ func _cancel_button_pressed():
 			set_phase(Phase.SET_CHARACTER)
 		else: 
 			rpc("set_phase", Phase.SET_CHARACTER)
+	
+	elif cancel_button.text == "Forfeit":
+		#TODO: Update this with code to lose the match later.
+		pass
 	
 @rpc("any_peer", "reliable")
 func set_lead_player(boolean):

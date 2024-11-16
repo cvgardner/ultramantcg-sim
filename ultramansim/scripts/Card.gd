@@ -1,6 +1,8 @@
 extends Node
 
 class_name Card
+var CardScene = preload("res://scenes/card.tscn")
+
 
 var card_name: String
 var card_no: String
@@ -59,7 +61,7 @@ func _init( card_name:= "Ultraman Dyna, Flash Type",
 	
 func _make_copy() -> Card:
 	'''Creates a new Card node with the same properties as the current one'''
-	var new_card = Card.new(
+	var new_card = CardScene.instantiate().with_data(
 		self.card_name,
 		self.card_no,
 		self.character,
@@ -68,9 +70,8 @@ func _make_copy() -> Card:
 		self.type,
 		self.bp,
 		self.abilities,
-		"dummy_path"
+		self.image_path
 	)
-	new_card.image = self.image
 	return new_card
 
 func with_data( card_name:= "Ultraman Dyna, Flash Type",
@@ -113,8 +114,8 @@ func with_data( card_name:= "Ultraman Dyna, Flash Type",
 	return self
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	$Level.texture = ResourceLoader.load("res://images/assets/level_{0}.png".format(str(level)))
-	$Stack.texture = ResourceLoader.load("res://images/assets/single.png")
+	$Level.texture = ResourceLoader.load("res://images/assets/level_{0}.png".format([str(self.level)]))
+	$Stack.texture = ResourceLoader.load("res://images/assets/SINGLE.png")
 	_update_power_text(self.bp['single'])
 	self.mouse_entered.connect(_on_mouse_entered)
 	pass # Replace with function body.
@@ -128,12 +129,19 @@ func flip_face_down():
 	Flips this card facedown aka change image to cardback
 	'''
 	self.image = ResourceLoader.load(image_path_card_back)
+	$TextureRect.texture = self.image
+	for ui in [$Level, $Power]:
+		ui.hide()
 	
 func flip_face_up():
 	'''
 	Flips this card face up aka change image to card image
 	'''
 	self.image = ResourceLoader.load(self.image_path)
+	$TextureRect.texture = self.image
+	for ui in [$Level, $Power]:
+		ui.show()
+
 
 func card_back(card_name:= "Ultraman Dyna, Flash Type",
 	 card_no:= "SD01-001",
@@ -185,6 +193,8 @@ func change_stack(new_stack):
 	'''
 	curr_stack = new_stack
 	$Stack.texture = ResourceLoader.load("res://images/assets/{0}.png".format([curr_stack]))
+	self.curr_power = self.bp[new_stack]
+	self._update_power_text(self.curr_power)
 
 	
 func _on_mouse_entered():

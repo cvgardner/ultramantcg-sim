@@ -55,20 +55,24 @@ text = "10,000"
 fit_content = true
 
 [node name="Stack" type="TextureRect" parent="."]
-layout_mode = 0
-offset_left = 37.0
-offset_top = -3.5
-offset_right = 57.0
-offset_bottom = 6.5
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -20.0
+offset_top = -8.5
+offset_right = 12.0
+offset_bottom = 16.5
+grow_horizontal = 0
 texture = ExtResource("3_rsri4")
 expand_mode = 1
 stretch_mode = 4
 
 [node name="Level" type="TextureRect" parent="."]
-layout_mode = 0
+layout_mode = 1
 offset_left = -19.0
-offset_top = -19.5
+offset_top = -18.5
 offset_right = 21.0
-offset_bottom = 20.5
+offset_bottom = 21.5
 texture = ExtResource("4_poptm")
 expand_mode = 1
