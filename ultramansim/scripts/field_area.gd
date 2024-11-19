@@ -4,7 +4,7 @@ extends HBoxContainer
 
 var data = [] #This will be a list of lists containing card instances
 #var card = load("res://scenes/card.tscn")
-
+signal item_hovered(item_card_no)
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	self.add_theme_constant_override("separation", 85)
@@ -59,10 +59,14 @@ func visualize(field, field_vis):
 		if not field_vis[i]:
 			new_card.flip_face_down()
 		#new_card.change_stack(stack_map[len(field[i])])
+		new_card.card_hovered.connect(_on_item_mouse_entered)
 		wrapper_node.add_child(new_card)
 		self.add_child(wrapper_node)		
 		i += 1
 		
+func _on_item_mouse_entered(card_no):
+	emit_signal("item_hovered", card_no)
+
 func flip_all_face_up():
 	''' flips all the first elements in each card stack face up then visualize'''
 	for item in self.get_children():

@@ -30,9 +30,9 @@ func _init( card_name:= "Ultraman Dyna, Flash Type",
  level:= 3,
  type:= "SPEED",
  bp:= {
-			"single": 9000,
-			"double": 11000,
-			"triple": 16000
+			"SINGLE": 9000,
+			"DOUBLE": 11000,
+			"TRIPLE": 16000
 		},
  abilities:= [
 			{
@@ -81,9 +81,9 @@ func with_data( card_name:= "Ultraman Dyna, Flash Type",
  level:= 3,
  type:= "SPEED",
  bp:= {
-			"single": 9000,
-			"double": 11000,
-			"triple": 16000
+			"SINGLE": 9000,
+			"DOUBLE": 11000,
+			"TRIPLE": 16000
 		},
  abilities:= [
 			{
@@ -116,7 +116,10 @@ func with_data( card_name:= "Ultraman Dyna, Flash Type",
 func _ready() -> void:
 	$Level.texture = ResourceLoader.load("res://images/assets/level_{0}.png".format([str(self.level)]))
 	$Stack.texture = ResourceLoader.load("res://images/assets/SINGLE.png")
-	_update_power_text(self.bp['single'])
+	self.curr_stack ='SINGLE'
+	self.curr_type = self.type
+	self.curr_power = self.bp[self.curr_stack]
+	_update_power_text(self.bp['SINGLE'])
 	self.mouse_entered.connect(_on_mouse_entered)
 	pass # Replace with function body.
 

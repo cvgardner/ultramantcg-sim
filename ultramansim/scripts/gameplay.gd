@@ -17,6 +17,10 @@ var player_field_vis = [] # Which cards are face up and face down on the player 
 var opp_field = [] # Opponent field specified as an array of array of nodes
 var opp_field_vis = [] # Boolean Array representing which card are face up and face down.
 
+# Battle Array is an int array containing the info about who won/lost
+# -1: Opponent Win, 0: Tie, 1: Player Win
+var battle_array = []
+
 var CardScene = preload("res://scenes/card.tscn")
 @export var local_test: bool = false
 
@@ -100,15 +104,26 @@ func _on_phase_changed(new_phase: Phase):
 				set_phase(Phase.OPEN)
 				pass
 			Phase.OPEN:
+				var s = "OPEN PHASE"
+				update_battle_log(s)
 				open_phase()
 				rpc("open_phase")
 				pass
 			Phase.EFFECT_ACTIVATION:
+				var s = "EFFECT ACTIVATION PHASE"
+				update_battle_log(s)
+				set_phase(Phase.JUDGEMENT)
 				pass
 			Phase.JUDGEMENT:
+				var s = "JUDGEMENT PHASE"
+				update_battle_log(s)
+				judgement_phase()
+				# TODO: Add Visual Aid for who won / is winning
 				pass
 			Phase.END:
-				current_round += 1
+				var s = "END PHASE"
+				update_battle_log(s)
+				end_phase()
 				pass
 	
 func start_phase():
@@ -144,12 +159,14 @@ func set_scene_phase(input):
 		set_scene_ui(selected_card_no)
 		rpc("set_scene_ui", selected_card_no)
 		GlobalData.player_hand.pop_at(input)
+		GlobalData.player_hand = GlobalData.player_hand + GlobalData.player_deck.draw_card(1)
 		emit_signal("hand_changed", "player", GlobalData.player_hand)
 	elif not is_lead:
 		var selected_card_no = GlobalData.opp_hand[int(input)]
 		set_scene_ui(selected_card_no)
 		rpc("set_scene_ui", selected_card_no)
 		GlobalData.opp_hand.pop_at(input)
+		GlobalData.opp_hand = GlobalData.opp_hand + GlobalData.opp_deck.draw_card(1)
 		emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
 		
 		
@@ -208,6 +225,51 @@ func set_character_phase(input, caller):
 func open_phase():
 	$PlayerField.flip_all_face_up()
 	$OppField.flip_all_face_up()
+	for field in [$PlayerField, $OppField]:
+		for wrapper in field.get_children():
+			wrapper.get_child(0).card_hovered.connect(_preview_card)
+	if multiplayer.is_server():
+		set_phase(Phase.JUDGEMENT)
+
+func judgement_phase():
+	battle_array = []
+	for ind in range(0, player_field.size()):
+		var player_power = $PlayerField.get_child(ind).get_child(0).curr_power
+		var opp_power = $OppField.get_child(ind).get_child(0).curr_power
+		
+		print("Player Power: {0} vs Opp Power: {1}".format([player_power, opp_power]))
+		if player_power > opp_power:
+			battle_array.append(1)
+		elif player_power == opp_power:
+			battle_array.append(0)
+		elif player_power < opp_power:
+			battle_array.append(-1)
+			
+	var judgement = 0
+	for result in battle_array:
+		judgement += result
+	
+	# Determine Winner
+	if judgement >= 3:
+		print("Server Wins!")
+	elif judgement <= -3:
+		print("Client Wins")
+	
+	# Determine Lead
+	if judgement > 0:
+		is_lead = true # player/server is winning
+	elif judgement == 0:
+		pass #No Changes to Lead
+	elif judgement < 0:
+		is_lead = false # opponent/client is winning
+	set_phase(Phase.END)
+		
+func end_phase():
+	# TODO: End of Turn Effects
+	# TODO: Reset Card power
+	current_round += 1
+	set_phase(Phase.START)
+	pass
 	
 func game_setup():	
 	if multiplayer.is_server():
@@ -299,9 +361,14 @@ func update_hand(player, hand):
 func update_field(player, field, field_vis):
 	if player == "player":
 		$PlayerField.visualize(field, field_vis)
+		for ind in range(0, field_vis.size()):
+			$PlayerField.get_child(ind).get_child(0).card_hovered.connect(_preview_card)
 	else: #If player is opponent
 		$OppField.visualize(field, field_vis)
-	
+		for ind in range(0, field_vis.size()):
+			if field_vis[ind]:
+				$OppField.get_child(ind).get_child(0).card_hovered.connect(_preview_card)
+
 
 @rpc("any_peer", "reliable")
 func mulligan(step):
@@ -392,11 +459,11 @@ func _action_button_pressed():
 				rpc("set_scene_phase", selected_item_index)
 			
 	elif action_button.text == "Set Character":
-		action_buttons_hide()
 		if len($PlayerHand.get_selected_items()) > 0:
 			var selected_item_index = $PlayerHand.get_selected_items()[0]
 			var selected_card = GlobalData.cards[$PlayerHand.get_item_metadata(selected_item_index)]
 			if selected_card.feature in ['Ultra Hero', 'Ultra Kaiju']:
+				action_buttons_hide()
 				if multiplayer.is_server():
 					set_character_phase(selected_item_index, "server")
 				else:		

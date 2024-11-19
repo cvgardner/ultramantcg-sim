@@ -7,15 +7,15 @@
 		"level": 3,
 		"type": "POWER",
 		"bp": {
-			"single": 7000,
-			"double": 13000,
-			"triple": 16000
+			"SINGLE": 7000,
+			"DOUBLE": 13000,
+			"TRIPLE": 16000
 		},
-		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <SPEED> or <ARMED>, this character's BP grade increases by 1.",
+		"ability_text": "[SINGLE][DOUBLE] While this character's battle opponent has TYPE <SPEED> or <ARMED>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
-				"stack_condition": ["single", "double"],
+				"stack_condition": ["SINGLE", "DOUBLE"],
                 "extra_condition": ["opponent_type_speed", "opponent_type_armed"],
 				"target": "SELF",
 				"effect": [{
@@ -33,15 +33,15 @@
 		"level": 3,
 		"type": "POWER",
 		"bp": {
-			"single": 7000,
-			"double": 13000,
-			"triple": 16000
+			"SINGLE": 7000,
+			"DOUBLE": 13000,
+			"TRIPLE": 16000
 		},
-		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <BASIC> or <ARMED>, this character's BP grade increases by 1.",
+		"ability_text": "[SINGLE][DOUBLE] While this character's battle opponent has TYPE <BASIC> or <ARMED>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
-				"stack_condition": ["single", "double"],
+				"stack_condition": ["SINGLE", "DOUBLE"],
                 "extra_condition": ["opponent_type_basic", "opponent_type_armed"],
 				"target": "SELF",
 				"effect": [{
@@ -59,15 +59,15 @@
 		"level": 3,
 		"type": "POWER",
 		"bp": {
-			"single": 7000,
-			"double": 11000,
-			"triple": 17000
+			"SINGLE": 7000,
+			"DOUBLE": 11000,
+			"TRIPLE": 17000
 		},
-		"ability_text": "[Single][Double][When this character enters play] You may give one of your DOUBLE <GEED> a BP grade increase by 1 for this turn.",
+		"ability_text": "[SINGLE][DOUBLE][When this character enters play] You may give one of your DOUBLE <GEED> a BP grade increase by 1 for this turn.",
 		"abilities": [
 			{
 				"trigger": "ENTERS_PLAY",
-				"stack_condition": ["single", "double"],
+				"stack_condition": ["SINGLE", "DOUBLE"],
                 "extra_condition": ["target_double"],
 				"target": ["GEED"],
 				"effect": [{
@@ -85,7 +85,7 @@
 		"level": 1,
 		"type": "SPEED",
 		"bp": {
-			"single": 5000
+			"SINGLE": 5000
 		},
 		"ability_text": "",
 		"abilities": [
@@ -100,15 +100,15 @@
 		"level": 2,
 		"type": "POWER",
 		"bp": {
-			"single": 7000,
-			"double": 10000,
-			"triple": 14000
+			"SINGLE": 7000,
+			"DOUBLE": 10000,
+			"TRIPLE": 14000
 		},
-		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <SPEED>, this character's BP grade increases by 1.",
+		"ability_text": "[SINGLE][DOUBLE] While this character's battle opponent has TYPE <SPEED>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
-				"stack_condition": ["single", "double"],
+				"stack_condition": ["SINGLE", "DOUBLE"],
                 "extra_condition": ["opponent_type_armed"],
 				"target": "SELF",
 				"effect": [{
@@ -126,8 +126,8 @@
 		"level": 2,
 		"type": "BASIC",
 		"bp": {
-			"single": 7000,
-			"double": 11000
+			"SINGLE": 7000,
+			"DOUBLE": 11000
 		},
 		"ability_text": "",
 		"abilities": [
@@ -142,7 +142,7 @@
 		"level": 1,
 		"type": "BASIC",
 		"bp": {
-			"single": 5000
+			"SINGLE": 5000
 		},
 		"ability_text": "",
 		"abilities": [
@@ -157,15 +157,15 @@
 		"level": 2,
 		"type": "SPEED",
 		"bp": {
-			"single": 7000,
-			"double": 10000,
-			"triple": 14000
+			"SINGLE": 7000,
+			"DOUBLE": 10000,
+			"TRIPLE": 14000
 		},
-		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <ARMED>, this character's BP grade increases by 1.",
+		"ability_text": "[SINGLE][DOUBLE] While this character's battle opponent has TYPE <ARMED>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
-				"stack_condition": ["single", "double"],
+				"stack_condition": ["SINGLE", "DOUBLE"],
 				"extra_condition": ["opponent_type_armed"],
                 "target": "SELF",
 				"effect": [{
@@ -183,8 +183,8 @@
 		"level": 2,
 		"type": "BASIC",
 		"bp": {
-			"single": 5000,
-			"double": 11000
+			"SINGLE": 5000,
+			"DOUBLE": 11000
 		},
 		"ability_text": "",
 		"abilities": [
@@ -199,7 +199,7 @@
 		"level": 1,
 		"type": "BASIC",
 		"bp": {
-			"single": 5000
+			"SINGLE": 5000
 		},
 		"ability_text": "",
 		"abilities": [
@@ -214,15 +214,15 @@
 		"level": 2,
 		"type": "SPEED",
 		"bp": {
-			"single": 7000,
-			"double": 10000,
-			"triple": 14000
+			"SINGLE": 7000,
+			"DOUBLE": 10000,
+			"TRIPLE": 14000
 		},
-		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <ARMED>, this character's BP grade increases by 1.",
+		"ability_text": "[SINGLE][DOUBLE] While this character's battle opponent has TYPE <ARMED>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
-				"stack_condition": ["single", "double"],
+				"stack_condition": ["SINGLE", "DOUBLE"],
 				"extra_condition": ["opponent_type_armed"],
                 "target": "SELF",
 				"effect": [{
@@ -240,15 +240,15 @@
 		"level": 6,
 		"type": "HAZARD",
 		"bp": {
-			"single": 10000,
-			"double": 16000,
+			"SINGLE": 10000,
+			"DOUBLE": 16000,
 			"extra": 8000
 		},
-		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <BASIC>, this character's BP grade becomes EXTRA.",
+		"ability_text": "[SINGLE][DOUBLE] While this character's battle opponent has TYPE <BASIC>, this character's BP grade becomes EXTRA.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
-				"stack_condition": ["single", "double"],
+				"stack_condition": ["SINGLE", "DOUBLE"],
 				"extra_condition": ["opponent_type_basic"],
                 "target": "SELF",
 				"effect": [{
@@ -266,14 +266,14 @@
 		"level": 6,
 		"type": "HAZARD",
 		"bp": {
-			"single": 9000,
-			"double": 15000
+			"SINGLE": 9000,
+			"DOUBLE": 15000
 		},
-		"ability_text": "[Single][When this character enters play] You may send one opponent's scene with round 1 to their discard area.",
+		"ability_text": "[SINGLE][When this character enters play] You may send one opponent's scene with round 1 to their discard area.",
 		"abilities": [
 			{
 				"trigger": "ENTER_PLAY",
-				"stack_condition": ["single"],
+				"stack_condition": ["SINGLE"],
 				"target": "OPPONENT_SCENE_1",
 				"effect": [{
 					"DISCARD": 0

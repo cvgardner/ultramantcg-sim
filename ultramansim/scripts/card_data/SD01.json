@@ -7,15 +7,15 @@
 		"level": 3,
 		"type": "SPEED",
 		"bp": {
-			"single": 9000,
-			"double": 11000,
-			"triple": 16000
+			"SINGLE": 9000,
+			"DOUBLE": 11000,
+			"TRIPLE": 16000
 		},
-		"ability_text": "[Double][Triple][When this character enters play] You may reveal the top three cards of your deck, to put one [Ultraman Tiga, Ultraman Dyna & Ultraman Gaia: The Battle in Hyper Space]. <TIGA>, or <GAIA> card from among them into your hand, and send the rest to your discard area",
+		"ability_text": "[DOUBLE][TRIPLE][When this character enters play] You may reveal the top three cards of your deck, to put one [Ultraman Tiga, Ultraman Dyna & Ultraman Gaia: The Battle in Hyper Space]. <TIGA>, or <GAIA> card from among them into your hand, and send the rest to your discard area",
 		"abilities": [
 			{
 				"trigger": "ENTER_PLAY",
-				"stack_condition": ["double", "triple"],
+				"stack_condition": ["DOUBLE", "TRIPLE"],
 				"target": {
 					"card_no": ["SD01-014"],
 					"character": ["TIGA", "GAIA"]
@@ -35,15 +35,15 @@
 		"level": 3,
 		"type": "BASIC",
 		"bp": {
-			"single": 9000,
-			"double": 12000,
-			"triple": 17000
+			"SINGLE": 9000,
+			"DOUBLE": 12000,
+			"TRIPLE": 17000
 		},
-		"ability_text": "[Triple][Activate][Once Per Turn][Discard one card from your hand] Give this character's battle opponent a BP grade decrease by 1 for this turn.",
+		"ability_text": "[TRIPLE][Activate][Once Per Turn][Discard one card from your hand] Give this character's battle opponent a BP grade decrease by 1 for this turn.",
 		"abilities": [
 			{
 				"trigger": "ACTIVATE",
-				"stack_condition": ["triple"],
+				"stack_condition": ["TRIPLE"],
 				"target": "BATTLE_OPPONENT",
 				"cost": {
 					"DISCARD": 1
@@ -63,15 +63,15 @@
 		"level": 3,
 		"type": "BASIC",
 		"bp": {
-			"single": 9000,
-			"double": 11000,
-			"triple": 16000
+			"SINGLE": 9000,
+			"DOUBLE": 11000,
+			"TRIPLE": 16000
 		},
-		"ability_text": "[Double][Triple][When this character enters play] You may reveal the top three cards of your deck, to put one [Ultraman Tiga, Ultraman Dyna & Ultraman Gaia: The Battle in Hyper Space]. <TIGA>, or <DYNA> card from among them into your hand, and send the rest to your discard area",
+		"ability_text": "[DOUBLE][TRIPLE][When this character enters play] You may reveal the top three cards of your deck, to put one [Ultraman Tiga, Ultraman Dyna & Ultraman Gaia: The Battle in Hyper Space]. <TIGA>, or <DYNA> card from among them into your hand, and send the rest to your discard area",
 		"abilities": [
 			{
 				"trigger": "ENTER_PLAY",
-				"stack_condition": ["double", "triple"],
+				"stack_condition": ["DOUBLE", "TRIPLE"],
 				"target": {
 					"card_no": ["SD01-014"],
 					"character": ["TIGA", "DYNA"]
@@ -91,7 +91,7 @@
 		"level": 1,
 		"type": "SPEED",
 		"bp": {
-			"single": 5000
+			"SINGLE": 5000
 		},
 		"ability_text": "",
 		"abilities": [
@@ -106,15 +106,15 @@
 		"level": 2,
 		"type": "BASIC",
 		"bp": {
-			"single": 7000,
-			"double": 10000,
-			"triple": 14000
+			"SINGLE": 7000,
+			"DOUBLE": 10000,
+			"TRIPLE": 14000
 		},
-		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <POWER>, this character's BP grade increases by 1.",
+		"ability_text": "[SINGLE][DOUBLE] While this character's battle opponent has TYPE <POWER>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
-				"stack_condition": ["single", "double"],
+				"stack_condition": ["SINGLE", "DOUBLE"],
 				"extra_condition": ["opponent_type_power"],
 				"target": "SELF",
 				"effect": [{
@@ -132,8 +132,8 @@
 		"level": 2,
 		"type": "BASIC",
 		"bp": {
-			"single": 8000,
-			"double": 10000
+			"SINGLE": 8000,
+			"DOUBLE": 10000
 		},
 		"ability_text": "",
 		"abilities": [
@@ -148,7 +148,7 @@
 		"level": 1,
 		"type": "BASIC",
 		"bp": {
-			"single": 5000
+			"SINGLE": 5000
 		},
 		"ability_text": "",
 		"abilities": [
@@ -163,15 +163,15 @@
 		"level": 2,
 		"type": "SPEED",
 		"bp": {
-			"single": 7000,
-			"double": 10000,
-			"triple": 14000
+			"SINGLE": 7000,
+			"DOUBLE": 10000,
+			"TRIPLE": 14000
 		},
-		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <ARMED>, this character's BP grade increases by 1.",
+		"ability_text": "[SINGLE][DOUBLE] While this character's battle opponent has TYPE <ARMED>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
-				"stack_condition": ["single", "double"],
+				"stack_condition": ["SINGLE", "DOUBLE"],
 				"extra_condition": ["opponent_type_armed"],
 				"target": "SELF",
 				"effect": [{
@@ -189,8 +189,8 @@
 		"level": 2,
 		"type": "BASIC",
 		"bp": {
-			"single": 8000,
-			"double": 10000
+			"SINGLE": 8000,
+			"DOUBLE": 10000
 		},
 		"ability_text": "",
 		"abilities": [
@@ -205,7 +205,7 @@
 		"level": 1,
 		"type": "POWER",
 		"bp": {
-			"single": 5000
+			"SINGLE": 5000
 		},
 		"ability_text": "",
 		"abilities": [
@@ -220,15 +220,15 @@
 		"level": 2,
 		"type": "POWER",
 		"bp": {
-			"single": 8000,
-			"double": 11000,
-			"triple": 13000
+			"SINGLE": 8000,
+			"DOUBLE": 11000,
+			"TRIPLE": 13000
 		},
-		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <SPEED>, this character's BP grade increases by 1.",
+		"ability_text": "[SINGLE][DOUBLE] While this character's battle opponent has TYPE <SPEED>, this character's BP grade increases by 1.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
-				"stack_condition": ["single", "double"],
+				"stack_condition": ["SINGLE", "DOUBLE"],
 				"extra_condition": ["opponent_type_speed"],
 				"target": "SELF",
 				"effect": [{
@@ -246,15 +246,15 @@
 		"level": 6,
 		"type": "HAZARD",
 		"bp": {
-			"single": 10000,
-			"double": 16000,
+			"SINGLE": 10000,
+			"DOUBLE": 16000,
 			"extra": 8000
 		},
-		"ability_text": "[Single][Double] While this character's battle opponent has TYPE <BASIC>, this character's BP becomes EXTRA.",
+		"ability_text": "[SINGLE][DOUBLE] While this character's battle opponent has TYPE <BASIC>, this character's BP becomes EXTRA.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
-				"stack_condition": ["single", "double"],
+				"stack_condition": ["SINGLE", "DOUBLE"],
 				"extra_condition": ["opponent_type_basic"],
 				"target": "SELF",
 				"effect": [{
@@ -272,14 +272,14 @@
 		"level": 6,
 		"type": "HAZARD",
 		"bp": {
-			"single": 9000,
-			"double": 15000
+			"SINGLE": 9000,
+			"DOUBLE": 15000
 		},
-		"ability_text": "[Single][When this character enters play] You may send on opponent's scene with round 0 to their discard area.",
+		"ability_text": "[SINGLE][When this character enters play] You may send on opponent's scene with round 0 to their discard area.",
 		"abilities": [
 			{
 				"trigger": "ENTER_PLAY",
-				"stack_condition": ["single"],
+				"stack_condition": ["SINGLE"],
 				"target": "OPPONENT_SCENE_0",
 				"effect": [{
 					"DISCARD": 0
