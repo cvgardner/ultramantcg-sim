@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://mvdg5c7lay7c"]
+[gd_scene load_steps=13 format=3 uid="uid://mvdg5c7lay7c"]
 
 [ext_resource type="Script" path="res://scripts/gameplay.gd" id="1_fwix1"]
 [ext_resource type="Texture2D" uid="uid://dp0r2d64mkguf" path="res://images/assets/UltramanMat.png" id="1_kbc0e"]
@@ -8,6 +8,16 @@
 [ext_resource type="Script" path="res://scenes/custom_scene_button.gd" id="5_jiqh6"]
 [ext_resource type="Script" path="res://scripts/CustomItemList.gd" id="6_g88w0"]
 [ext_resource type="Script" path="res://scripts/field_area.gd" id="8_42txr"]
+[ext_resource type="Texture2D" uid="uid://cg1fg42fb5ok1" path="res://images/assets/youwin.png" id="9_5abwo"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jusy4"]
+bg_color = Color(0.180392, 0.180392, 0.180392, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ybuap"]
+bg_color = Color(0.180392, 0.180392, 0.180392, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pw32g"]
+bg_color = Color(0.180392, 0.180392, 0.180392, 1)
 
 [node name="gameplay" type="Control"]
 custom_minimum_size = Vector2(1152, 648)
@@ -210,3 +220,43 @@ offset_top = 141.0
 offset_right = 850.0
 offset_bottom = 273.0
 script = ExtResource("8_42txr")
+
+[node name="GameEndNode" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 489.0
+offset_bottom = 234.0
+
+[node name="GameEndImage" type="TextureRect" parent="GameEndNode"]
+layout_mode = 0
+offset_left = 255.0
+offset_top = 20.0
+offset_right = 883.0
+offset_bottom = 636.0
+texture = ExtResource("9_5abwo")
+
+[node name="RematchButton" type="Button" parent="GameEndNode"]
+layout_mode = 0
+offset_left = 338.0
+offset_top = 441.0
+offset_right = 560.0
+offset_bottom = 518.0
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("StyleBoxFlat_jusy4")
+text = "Rematch"
+
+[node name="MainMenuButton2" type="Button" parent="GameEndNode"]
+layout_mode = 0
+offset_left = 569.0
+offset_top = 441.0
+offset_right = 791.0
+offset_bottom = 518.0
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("StyleBoxFlat_ybuap")
+text = "Leave"
+
+[node name="LoadDeckOptions" type="OptionButton" parent="GameEndNode"]
+offset_left = 454.0
+offset_top = 410.0
+offset_right = 682.0
+offset_bottom = 430.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_pw32g")

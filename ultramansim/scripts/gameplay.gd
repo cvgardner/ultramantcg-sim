@@ -5,6 +5,7 @@ var is_lead : bool # Boolean signifying if the server is lead or not
 @onready var cancel_button = $ActionButtonContainer/CancelButton
 @onready var battle_log = $BattleLog
 @onready var card_preview = $CardPreview
+@onready var load_deck_options = $GameEndNode/LoadDeckOptions
 var battle_log_text = "" # String battle log text
 enum Phase { SETUP, START, DRAW, LEAD_SCENE_SET, SET_CHARACTER, LEVEL_UP, OPEN, EFFECT_ACTIVATION, JUDGEMENT, END}
 var current_phase 
@@ -16,6 +17,9 @@ var player_field = [] # Player field specified as an array of array of nodes
 var player_field_vis = [] # Which cards are face up and face down on the player field
 var opp_field = [] # Opponent field specified as an array of array of nodes
 var opp_field_vis = [] # Boolean Array representing which card are face up and face down.
+var rematch_requests = [] # Used to count rematch requests
+
+
 
 # Battle Array is an int array containing the info about who won/lost
 # -1: Opponent Win, 0: Tie, 1: Player Win
@@ -30,9 +34,14 @@ signal lead_player_chosen()
 signal hand_changed(player, hand)
 signal field_changed(player, field, field_vis)
 signal start_mulligan
+signal rematch_requested()
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if local_test:
+		print("Setting up Local Test")
+		print("Checking Decks")
+		print(GlobalData.player_deck.deckdict)
+		print(GlobalData.opp_deck.deckdict)
 		configure_local_test()
 		#Test Connection
 		
@@ -45,9 +54,15 @@ func _ready() -> void:
 	start_mulligan.connect(do_mulligan)
 	$SceneButton.button_hovered.connect(_preview_card)
 	
+	$MainMenuButton.pressed.connect(_on_BackButton_pressed)
+	$GameEndNode/MainMenuButton2.pressed.connect(_on_BackButton_pressed)
+	$GameEndNode/RematchButton.pressed.connect(_on_rematch_button_pressed)
+
+	
 	#Hide some UI components
 	action_buttons_hide()
 	configure_hand_ui()
+	$GameEndNode.hide()
 	
 	# Ready UI Components
 	$PlayerId.text = GlobalData.player_id
@@ -172,8 +187,10 @@ func set_scene_phase(input):
 		
 	if str(input) != "init":
 		action_buttons_hide()
-		set_phase(Phase.SET_CHARACTER)
-		rpc("set_phase", Phase.SET_CHARACTER)
+		if is_lead:
+			set_phase(Phase.SET_CHARACTER)
+		else:
+			rpc("set_phase", Phase.SET_CHARACTER)
 		
 		
 @rpc("any_peer", "reliable")
@@ -183,11 +200,20 @@ func set_scene_ui(selected_card_no):
 @rpc("any_peer", "reliable")
 func set_character_phase(input, caller):	
 	'''Performs Set Character and visual update actions'''
-	
+	print("Set Char Phase ", multiplayer.is_server())
+
 	if str(input) == "init":
 		action_button.text = "Set Character"
 		cancel_button.text = "Forfeit"
 		action_buttons_show()
+		
+	#if len(player_field) == current_round + 1 and len(player_field) == len(opp_field):
+		#action_buttons_hide()
+		#if multiplayer.is_server():
+			#set_phase(Phase.LEVEL_UP)	
+		#else:
+			#rpc("set_phase", Phase.LEVEL_UP)
+		#return
 	
 	if str(input) != "init": #Input is the index from hand of the selected card
 		if caller == "server":
@@ -199,7 +225,10 @@ func set_character_phase(input, caller):
 			emit_signal("hand_changed", "player", GlobalData.player_hand)
 			emit_signal("field_changed", "player", player_field, player_field_vis)
 			action_buttons_hide()
-			rpc("set_character_phase", "init", "client")
+			if len(player_field) == current_round + 1 and len(player_field) == len(opp_field):
+				set_phase(Phase.LEVEL_UP)
+			else:
+				rpc("set_character_phase", "init", "client")
 			
 		elif caller == "client":
 			var selected_card_no = GlobalData.opp_hand[int(input)]
@@ -209,20 +238,18 @@ func set_character_phase(input, caller):
 			emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
 			emit_signal("field_changed", "opponent", opp_field, opp_field_vis)
 			action_buttons_hide()
-			set_character_phase("init", "server")
-
+			if len(player_field) == current_round + 1 and len(player_field) == len(opp_field):
+				set_phase(Phase.LEVEL_UP)
+			else:
+				set_character_phase("init", "server")
 	
-	if len(player_field) == current_round + 1 and len(player_field) == len(opp_field):
-		action_buttons_hide()
-		if multiplayer.is_server():
-			set_phase(Phase.LEVEL_UP)	
-		else:
-			rpc("set_phase", Phase.LEVEL_UP)
-		return
 		
 	
 @rpc("any_peer", "reliable")
 func open_phase():
+	for vis in [player_field_vis, opp_field_vis]:
+		for i in range(0,player_field_vis.size()):
+			vis[i] = true
 	$PlayerField.flip_all_face_up()
 	$OppField.flip_all_face_up()
 	for field in [$PlayerField, $OppField]:
@@ -232,36 +259,40 @@ func open_phase():
 		set_phase(Phase.JUDGEMENT)
 
 func judgement_phase():
-	battle_array = []
+	var player_wins = 0
+	var opp_wins = 0
 	for ind in range(0, player_field.size()):
 		var player_power = $PlayerField.get_child(ind).get_child(0).curr_power
 		var opp_power = $OppField.get_child(ind).get_child(0).curr_power
 		
 		print("Player Power: {0} vs Opp Power: {1}".format([player_power, opp_power]))
 		if player_power > opp_power:
-			battle_array.append(1)
+			player_wins += 1
 		elif player_power == opp_power:
-			battle_array.append(0)
+			pass
 		elif player_power < opp_power:
-			battle_array.append(-1)
-			
-	var judgement = 0
-	for result in battle_array:
-		judgement += result
+			opp_wins += 1
+	
+	print("Judgement ", player_wins, " ", opp_wins)
 	
 	# Determine Winner
-	if judgement >= 3:
+	if player_wins >= 3:
 		print("Server Wins!")
-	elif judgement <= -3:
+		game_end(true)
+		rpc("game_end", false)
+	elif opp_wins >= 3:
 		print("Client Wins")
+		game_end(false)
+		rpc("game_end", true)
 	
 	# Determine Lead
-	if judgement > 0:
+	if player_wins > opp_wins:
 		is_lead = true # player/server is winning
-	elif judgement == 0:
-		pass #No Changes to Lead
-	elif judgement < 0:
+	elif player_wins < opp_wins:
 		is_lead = false # opponent/client is winning
+	else:
+		pass #No Changes to Lead
+	
 	set_phase(Phase.END)
 		
 func end_phase():
@@ -270,6 +301,19 @@ func end_phase():
 	current_round += 1
 	set_phase(Phase.START)
 	pass
+	
+@rpc("any_peer", "reliable")
+func game_end(is_winner):
+	'''Takes a boolean is_winner and runs end of game procedure'''
+	if is_winner:
+		$GameEndNode/GameEndImage.texture = ResourceLoader.load("res://images/assets/youwin.png")
+	else:
+		$GameEndNode/GameEndImage.texture = ResourceLoader.load("res://images/assets/youlose.png")
+	
+	$GameEndNode.show()
+	action_buttons_hide()
+	populate_load_deck_options()
+	
 	
 func game_setup():	
 	if multiplayer.is_server():
@@ -593,7 +637,89 @@ func configure_local_test():
 		peer.create_client(IP_ADDRESS, PORT)
 		get_tree().get_multiplayer().set_multiplayer_peer(peer)
 		print("Setup client", multiplayer.is_server())
+		
+func populate_load_deck_options():
+	'''Populates the option buttion LoadDeckOptions with decks from res://decks'''
+	load_deck_options.clear()
+	load_deck_options.add_item("Change Deck")
+	var dir = DirAccess.open('res://decks')
+	if dir:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		while file_name != "":
+			if not dir.current_is_dir():
+				load_deck_options.add_item(file_name.replace(".json", ""))
+			file_name = dir.get_next()
+		dir.list_dir_end()
+	else:
+		print("ERROR: Failed to open directory res://Decks")
+	make_option_button_items_non_radio_checkable(load_deck_options)
+	
+func make_option_button_items_non_radio_checkable(option_button: OptionButton) -> void:
+	var pm: PopupMenu = option_button.get_popup()
+	for i in pm.get_item_count():
+		if pm.is_item_radio_checkable(i):
+			pm.set_item_as_radio_checkable(i, false)
+			
+func _on_BackButton_pressed():
+	''' Return to Main Menu Screen'''
+	disconnect_server()
+	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+	
+	
+@rpc("any_peer", "reliable")
+func disconnect_server():
+	get_tree().get_multiplayer().set_multiplayer_peer(null)
+	
+func _on_rematch_button_pressed():
+	'''Sets the new deck from deckload options if selected'''
+	if multiplayer.is_server():
+		load_deck_list_json()
+		request_rematch(GlobalData.player_id)
+	else:
+		load_deck_list_json()
+		print("Rematch Client Deck ", GlobalData.player_deck.deckdict)
+		rpc("send_opp_deck", GlobalData.player_deck.deckdict)
+		rpc("request_rematch", GlobalData.player_id)
 
+@rpc("any_peer", "reliable")
+func send_opp_deck(deckdict):
+	GlobalData.opp_deck.deckdict = deckdict
+
+@rpc("any_peer", 'reliable')
+func request_rematch(player_id):
+	print(rematch_requests)
+	if player_id not in rematch_requests:
+		rematch_requests.append(player_id)
+	print(rematch_requests)
+
+	if rematch_requests.size() >= 2:
+		rpc("start_rematch")
+		start_rematch()
+		
+
+@rpc("any_peer", 'reliable')	
+func start_rematch():
+	var current_scene = get_tree().current_scene 
+	get_tree().reload_current_scene()
+
+@rpc("any_peer", "reliable")
+func load_deck_list_json():
+	'''Loads decklist from json file in res://decks'''
+	var file_name = $GameEndNode/LoadDeckOptions.text
+	if file_name == "Change Deck":
+		return
+	var file_path = 'res://decks/' + file_name + '.json'
+	var file = FileAccess.open(file_path, FileAccess.READ)
+	if file:
+		var json_text = file.get_as_text()
+		var json_result = JSON.parse_string(json_text)
+		GlobalData.player_deck.deckdict = json_result
+
+
+	else:
+		print("ERROR: Failed to open file ", file_path)
+		
 func update_stack():
 	'''Function to update the Single/Double/Triple values of curr_stack and update the associated icon'''
 	#TODO
