@@ -255,6 +255,7 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_ybuap")
 text = "Leave"
 
 [node name="LoadDeckOptions" type="OptionButton" parent="GameEndNode"]
+layout_mode = 0
 offset_left = 454.0
 offset_top = 410.0
 offset_right = 682.0

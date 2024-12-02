@@ -189,6 +189,12 @@ func show_stack():
 func hide_stack():
 	$Stack.hide()
 	
+func show_highlight():
+	$Highlight.show()
+
+func hide_highlight():
+	$Highlight.hide()
+	
 func change_stack(new_stack):
 	'''
 	changes the curr_stack variable and then stack icon

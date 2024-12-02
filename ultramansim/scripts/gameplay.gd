@@ -18,6 +18,7 @@ var player_field_vis = [] # Which cards are face up and face down on the player 
 var opp_field = [] # Opponent field specified as an array of array of nodes
 var opp_field_vis = [] # Boolean Array representing which card are face up and face down.
 var rematch_requests = [] # Used to count rematch requests
+var level_up_complete = [] # Keeps track of which players have completed the level up phase
 
 
 
@@ -116,7 +117,7 @@ func _on_phase_changed(new_phase: Phase):
 			Phase.LEVEL_UP:
 				var s = "LEVEL UP PHASE"
 				update_battle_log(s)
-				set_phase(Phase.OPEN)
+				level_up_phase("init")
 				pass
 			Phase.OPEN:
 				var s = "OPEN PHASE"
@@ -242,7 +243,69 @@ func set_character_phase(input, caller):
 				set_phase(Phase.LEVEL_UP)
 			else:
 				set_character_phase("init", "server")
+
+@rpc("any_peer", "reliable")
+func level_up_phase(input):
+	print(multiplayer.is_server(), " Level up complete ", level_up_complete)
+	if level_up_complete.size() >= 2:
+		level_up_complete = []
+		highlight_none() #Undo Highlights from level up selection
+		$ActionButtonContainer/ActionButton.show() #fix only having one button bug
+		action_buttons_hide()
+		set_phase(Phase.OPEN)
+		return
 	
+	
+	if str(input) == "init":
+		level_up_complete = []
+		if is_lead:
+			level_up_phase("server")
+		else:
+			level_up_phase("client")
+			
+	elif str(input) == "client":
+		level_up_complete.append("client")
+		rpc("level_up_phase_rpc")
+		
+				
+		
+	elif str(input) == "server":
+		level_up_complete.append("server")
+		level_up_phase_rpc()
+		
+
+@rpc("any_peer", "reliable")
+func level_up_phase_rpc():
+	if multiplayer.is_server():
+		pass
+	else:
+		current_phase = Phase.LEVEL_UP
+	# Disable All Cards in hand
+	for i in range($PlayerHand.get_item_count()):
+		$PlayerHand.set_item_disabled(i, true)
+	
+	# Enable all cards usable for level up
+	for node in $PlayerField.get_children():
+		for i in range($PlayerHand.get_item_count()):
+			var card = node.get_child(0)
+			var hand_card = GlobalData.cards[$PlayerHand.get_item_metadata(i)]
+			if hand_card.level == card.level + 1 and hand_card.character == card.character:
+				$PlayerHand.set_item_disabled(i, false)
+				
+	cancel_button.text = "No Level Ups"
+	action_buttons_show()
+	$ActionButtonContainer/ActionButton.hide()
+
+func level_phase_highlight(selected):
+	#de highlight all
+	highlight_none()
+	#Highligh recommented
+	if current_phase == Phase.LEVEL_UP:
+		for node in $PlayerField.get_children():
+			var card = node.get_child(0)
+			var selected_card = GlobalData.cards[$PlayerHand.get_item_metadata(selected)]
+			if card.level == selected_card.level - 1 && card.character == selected_card.character:
+				card.show_highlight()
 		
 	
 @rpc("any_peer", "reliable")
@@ -545,7 +608,16 @@ func _cancel_button_pressed():
 	
 	elif cancel_button.text == "Forfeit":
 		#TODO: Update this with code to lose the match later.
-		pass
+		game_end(false)
+		rpc("game_end", true)
+		
+	elif cancel_button.text == "No Level Ups" and current_phase == Phase.LEVEL_UP:
+		action_buttons_hide()
+		if multiplayer.is_server():
+			level_up_phase("client")
+		else:
+			$ActionButtonContainer/ActionButton.show() #fix only having one button bug
+			rpc("level_up_phase", "server")
 	
 @rpc("any_peer", "reliable")
 func set_lead_player(boolean):
@@ -590,6 +662,7 @@ func configure_hand_ui():
 	$PlayerHand.set_allow_rmb_select(true)
 	$PlayerHand.set_icon_mode(0)
 	$PlayerHand.hovered_item.connect(_preview_card)
+	$PlayerHand.item_selected.connect(level_phase_highlight)
 	
 	$OppHand.auto_height = true
 	$OppHand.set_max_columns(0)
@@ -719,7 +792,17 @@ func load_deck_list_json():
 
 	else:
 		print("ERROR: Failed to open file ", file_path)
-		
+
+func highlight_all():
+	for node in $PlayerField.get_children():
+			var card = node.get_child(0)
+			card.show_highlight()
+				
+func highlight_none():
+	for node in $PlayerField.get_children():
+			var card = node.get_child(0)
+			card.hide_highlight()
+			
 func update_stack():
 	'''Function to update the Single/Double/Triple values of curr_stack and update the associated icon'''
 	#TODO
