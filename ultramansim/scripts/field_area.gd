@@ -54,9 +54,7 @@ func visualize(field, field_vis):
 		wrapper_node.set_size(Vector2(75,100))
 		#self.add_child(GlobalData.cards[field[i][0]])
 		var new_card = GlobalData.cards[field[i][0]]._make_copy()
-		print(field_vis, field_vis[i],not field_vis[i], !field_vis[i])
-		if not field_vis[i]:
-			new_card.flip_face_down()
+		
 		#new_card.change_stack(stack_map[len(field[i])])
 		new_card.card_hovered.connect(_on_item_mouse_entered)
 		#wrapper_node.gui_input.connect(_on_child_gui_input)
@@ -70,7 +68,9 @@ func visualize(field, field_vis):
 		#update stack
 		print("Stack Size: ", field[i].size())
 		new_card.change_stack(stack_map[field[i].size()])
-		
+		if not field_vis[i]:
+			new_card.flip_face_down()
+			
 		i += 1
 		
 func _on_item_mouse_entered(card_no):

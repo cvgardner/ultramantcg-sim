@@ -19,7 +19,7 @@ var opp_field = [] # Opponent field specified as an array of array of nodes
 var opp_field_vis = [] # Boolean Array representing which card are face up and face down.
 var rematch_requests = [] # Used to count rematch requests
 var level_up_complete = [] # Keeps track of which players have completed the level up phase
-
+var can_level = [] # Array of indexes which can level
 
 
 # Battle Array is an int array containing the info about who won/lost
@@ -281,16 +281,29 @@ func level_up_phase_rpc():
 		pass
 	else:
 		current_phase = Phase.LEVEL_UP
+	#If its level_up setup then populate can_level
+	if can_level == []:
+		for node in $PlayerField.get_children():
+				can_level.append(true)	
+		
 	# Disable All Cards in hand
 	for i in range($PlayerHand.get_item_count()):
 		$PlayerHand.set_item_disabled(i, true)
 	
 	# Enable all cards usable for level up
-	for node in $PlayerField.get_children():
+	#for node in $PlayerField.get_children():
+		#for i in range($PlayerHand.get_item_count()):
+			#var card = node.get_child(0)
+			#var hand_card = GlobalData.cards[$PlayerHand.get_item_metadata(i)]
+			#if hand_card.level == card.level + 1 and hand_card.character == card.character and card.face_up:
+				#$PlayerHand.set_item_disabled(i, false)
+				
+	# Enable all cards usable for level up
+	for cl in range(can_level.size()):
 		for i in range($PlayerHand.get_item_count()):
-			var card = node.get_child(0)
+			var card = $PlayerField.get_child(cl).get_child(0)
 			var hand_card = GlobalData.cards[$PlayerHand.get_item_metadata(i)]
-			if hand_card.level == card.level + 1 and hand_card.character == card.character:
+			if hand_card.level == card.level + 1 and hand_card.character == card.character and can_level[cl]:
 				$PlayerHand.set_item_disabled(i, false)
 				
 	cancel_button.text = "No Level Ups"
@@ -302,10 +315,11 @@ func level_phase_highlight(selected):
 	highlight_none()
 	#Highligh recommented
 	if current_phase == Phase.LEVEL_UP:
-		for node in $PlayerField.get_children():
-			var card = node.get_child(0)
+		for i in range(can_level.size()):
+		#for node in $PlayerField.get_children():
+			var card = $PlayerField.get_child(i).get_child(0)
 			var selected_card = GlobalData.cards[$PlayerHand.get_item_metadata(selected)]
-			if card.level == selected_card.level - 1 && card.character == selected_card.character:
+			if card.level == selected_card.level - 1 && card.character == selected_card.character and can_level[i]:
 				card.show_highlight()
 		
 	
@@ -561,7 +575,7 @@ func _action_button_pressed():
 
 			var selected_item_index = $PlayerHand.get_selected_items()[0]
 			var selected_card = GlobalData.cards[$PlayerHand.get_item_metadata(selected_item_index)]
-			if multiplayer.is_server() and selected_card.feature == "Scene" and selected_card.level == current_round:
+			if multiplayer.is_server() and selected_card.feature == "Scene" and selected_card.level <= current_round:
 				set_scene_phase(selected_item_index)
 			elif selected_card.feature == "Scene" and selected_card.level == current_round:
 				rpc("set_scene_phase", selected_item_index)
@@ -613,11 +627,14 @@ func _cancel_button_pressed():
 		rpc("game_end", true)
 		
 	elif cancel_button.text == "No Level Ups" and current_phase == Phase.LEVEL_UP:
+		highlight_none()
 		action_buttons_hide()
+		can_level = []
 		if multiplayer.is_server():
 			level_up_phase("client")
 		else:
 			$ActionButtonContainer/ActionButton.show() #fix only having one button bug
+			current_phase = Phase.OPEN
 			rpc("level_up_phase", "server")
 	
 @rpc("any_peer", "reliable")
@@ -695,8 +712,8 @@ func configure_local_test():
 	var IP_ADDRESS = "127.0.0.1"
 	var PORT = 54321
 	if is_server:
-		GlobalData.player_deck.deckdict = {"SD01-001":1,"SD01-002":1,"SD01-003":1,"SD01-004":4,"SD01-006":1,"SD01-007":2,"SD01-008":3,"SD01-009":1,"SD01-010":2, "SD02-014": 4}
-		GlobalData.opp_deck.deckdict = {"SD01-001":1,"SD01-002":1,"SD01-003":1,"SD01-004":4,"SD01-006":1,"SD01-007":2,"SD01-008":3,"SD01-009":1,"SD01-010":2, "SD02-014": 4}
+		GlobalData.player_deck.deckdict = {"SD01-001":4,"SD01-004":4,"SD01-007":4,"SD01-008":3,"SD01-009":4}
+		GlobalData.opp_deck.deckdict = {"SD01-001":4,"SD01-004":4,"SD01-007":4,"SD01-008":3,"SD01-009":4}
 		GlobalData.player_id = "Server"
 		GlobalData.opp_id = "Client"
 		var peer = ENetMultiplayerPeer.new()
@@ -815,7 +832,8 @@ func highlight_clicked(clicked_index):
 	var clicked_wrapper = $PlayerField.get_child(clicked_index)
 	var clicked_card = clicked_wrapper.get_child(0)
 	
-	if selected_card.character == clicked_card.character && selected_card.level - 1 == clicked_card.level:
+	if selected_card.character == clicked_card.character && selected_card.level - 1 == clicked_card.level && can_level[clicked_index]:
+		can_level[clicked_index] = false
 		if multiplayer.is_server():
 			highlight_clicked_rpc('server', selected_ind, selected_card.card_no, clicked_index, clicked_card)
 		else:
@@ -829,22 +847,27 @@ func highlight_clicked_rpc(caller, selected_ind, selected_card, clicked_index, c
 		#Get the selected index from playerfield to update player_field list
 		print("Level up Clicked", player_field)
 		player_field[clicked_index] = [selected_card] + player_field[clicked_index]
+		player_field_vis[clicked_index] = false
 		print("Level up Clicked2", player_field)
 		#Remove Card from hand
 		GlobalData.player_hand.pop_at(selected_ind)
 		
 		emit_signal("hand_changed", "player", GlobalData.player_hand)
 		emit_signal("field_changed", "player", player_field, player_field_vis)
+		level_up_phase_rpc()
+		
 	elif caller == 'client':
 		#Get the selected index from playerfield to update player_field list
 		print("Level up Clicked", opp_field)
 		opp_field[clicked_index] = [selected_card] + opp_field[clicked_index]
+		opp_field_vis[clicked_index] = false
 		print("Level up Clicked2", opp_field)
 		#Remove Card from hand
 		GlobalData.opp_hand.pop_at(selected_ind)
 		
 		emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
 		emit_signal("field_changed", "opponent", opp_field, opp_field_vis)
+		rpc("level_up_phase_rpc")
 	
 	
 	

@@ -20,6 +20,7 @@ var curr_stack : String
 var curr_power : int
 var curr_type : String
 var image_path_card_back = "res://images/assets/card_back.png"
+var face_up : bool
 
 signal card_hovered(card_no)
 
@@ -121,6 +122,7 @@ func _ready() -> void:
 	self.curr_power = self.bp[self.curr_stack]
 	_update_power_text(self.bp['SINGLE'])
 	self.mouse_entered.connect(_on_mouse_entered)
+	self.face_up = true
 	pass # Replace with function body.
 
 func _update_power_text(power: int):
@@ -131,6 +133,7 @@ func flip_face_down():
 	'''
 	Flips this card facedown aka change image to cardback
 	'''
+	self.face_up = false
 	self.image = ResourceLoader.load(image_path_card_back)
 	$TextureRect.texture = self.image
 	for ui in [$Level, $Power]:
@@ -140,6 +143,7 @@ func flip_face_up():
 	'''
 	Flips this card face up aka change image to card image
 	'''
+	self.face_up = true
 	self.image = ResourceLoader.load(self.image_path)
 	$TextureRect.texture = self.image
 	for ui in [$Level, $Power]:
