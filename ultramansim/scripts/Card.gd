@@ -198,10 +198,13 @@ func hide_highlight():
 func change_stack(new_stack):
 	'''
 	changes the curr_stack variable and then stack icon
-	input should be either "SINGLE", "DOUBLE" or "TRIPLE"
+	input should be either  "SINGLE", "DOUBLE" or "TRIPLE"
 	'''
+	print("Stack Change: ", curr_stack, new_stack)
 	curr_stack = new_stack
+	print("New Stack Image: ", "res://images/assets/{0}.png".format([curr_stack]))
 	$Stack.texture = ResourceLoader.load("res://images/assets/{0}.png".format([curr_stack]))
+	print("Power Change: ", self.curr_power, self.bp[new_stack])
 	self.curr_power = self.bp[new_stack]
 	self._update_power_text(self.curr_power)
 

@@ -58,6 +58,7 @@ func _ready() -> void:
 	$MainMenuButton.pressed.connect(_on_BackButton_pressed)
 	$GameEndNode/MainMenuButton2.pressed.connect(_on_BackButton_pressed)
 	$GameEndNode/RematchButton.pressed.connect(_on_rematch_button_pressed)
+	$PlayerField.item_clicked.connect(highlight_clicked)
 
 	
 	#Hide some UI components
@@ -802,6 +803,51 @@ func highlight_none():
 	for node in $PlayerField.get_children():
 			var card = node.get_child(0)
 			card.hide_highlight()
+			
+func highlight_clicked(clicked_index):
+	'''Processes level up logic when clicking a card that satisfies the level up'''
+	if current_phase != Phase.LEVEL_UP: #Skip code if its not the level up phase
+		return
+
+	var selected_ind = $PlayerHand.get_selected_items()[0]
+	var selected_card = GlobalData.cards[$PlayerHand.get_item_metadata(selected_ind)]
+	print("Clicked Index: ", clicked_index)
+	var clicked_wrapper = $PlayerField.get_child(clicked_index)
+	var clicked_card = clicked_wrapper.get_child(0)
+	
+	if selected_card.character == clicked_card.character && selected_card.level - 1 == clicked_card.level:
+		if multiplayer.is_server():
+			highlight_clicked_rpc('server', selected_ind, selected_card.card_no, clicked_index, clicked_card)
+		else:
+			rpc("highlight_clicked_rpc", 'client', selected_ind, selected_card.card_no, clicked_index, clicked_card)
+
+		
+@rpc("any_peer", "reliable")
+func highlight_clicked_rpc(caller, selected_ind, selected_card, clicked_index, clicked_card):
+	'''Does level up logic based on the caller'''
+	if caller == 'server':
+		#Get the selected index from playerfield to update player_field list
+		print("Level up Clicked", player_field)
+		player_field[clicked_index] = [selected_card] + player_field[clicked_index]
+		print("Level up Clicked2", player_field)
+		#Remove Card from hand
+		GlobalData.player_hand.pop_at(selected_ind)
+		
+		emit_signal("hand_changed", "player", GlobalData.player_hand)
+		emit_signal("field_changed", "player", player_field, player_field_vis)
+	elif caller == 'client':
+		#Get the selected index from playerfield to update player_field list
+		print("Level up Clicked", opp_field)
+		opp_field[clicked_index] = [selected_card] + opp_field[clicked_index]
+		print("Level up Clicked2", opp_field)
+		#Remove Card from hand
+		GlobalData.opp_hand.pop_at(selected_ind)
+		
+		emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
+		emit_signal("field_changed", "opponent", opp_field, opp_field_vis)
+	
+	
+	
 			
 func update_stack():
 	'''Function to update the Single/Double/Triple values of curr_stack and update the associated icon'''
