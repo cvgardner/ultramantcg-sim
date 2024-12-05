@@ -33,7 +33,7 @@ func level_up(field, index, card_no):
 
 
 #TODO: Update function to take in the card_no arry and boolean array necessary for UI updates
-func visualize(field, field_vis):
+func visualize(field, field_vis, field_mod):
 	'''
 	Updates the visual in the hbox container based on the list 'data'
 	'''
@@ -65,12 +65,12 @@ func visualize(field, field_vis):
 		wrapper_node.add_child(new_card)
 		self.add_child(wrapper_node)		
 		
-		#update stack
+		#update card (stack, vis, power)
 		print("Stack Size: ", field[i].size())
 		new_card.change_stack(stack_map[field[i].size()])
 		if not field_vis[i]:
 			new_card.flip_face_down()
-			
+		new_card.add_power(field_mod[i])
 		i += 1
 		
 func _on_item_mouse_entered(card_no):

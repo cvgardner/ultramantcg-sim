@@ -20,6 +20,27 @@ var opp_field_vis = [] # Boolean Array representing which card are face up and f
 var rematch_requests = [] # Used to count rematch requests
 var level_up_complete = [] # Keeps track of which players have completed the level up phase
 var can_level = [] # Array of indexes which can level
+var player_action_queue = []
+var opp_action_queue = []
+var player_field_mod = []
+var opp_field_mod = []
+
+var player_game_data = {
+	"field": player_field,
+	"field_vis": player_field_vis,
+	"field_mod": player_field_mod,
+	"hand": GlobalData.player_hand,
+	"deck": GlobalData.player_deck.deck
+}
+
+
+var opp_game_data = {
+	"field": opp_field,
+	"field_vis": opp_field_vis,
+	"field_mod": opp_field_mod,
+	"hand": GlobalData.opp_hand,
+	"deck": GlobalData.opp_deck.deck
+}
 
 
 # Battle Array is an int array containing the info about who won/lost
@@ -33,7 +54,7 @@ var CardScene = preload("res://scenes/card.tscn")
 signal phase_changed(new_phase: Phase)
 signal lead_player_chosen()
 signal hand_changed(player, hand)
-signal field_changed(player, field, field_vis)
+signal field_changed(player, field, field_vis, field_mod)
 signal start_mulligan
 signal rematch_requested()
 # Called when the node enters the scene tree for the first time.
@@ -129,7 +150,7 @@ func _on_phase_changed(new_phase: Phase):
 			Phase.EFFECT_ACTIVATION:
 				var s = "EFFECT ACTIVATION PHASE"
 				update_battle_log(s)
-				set_phase(Phase.JUDGEMENT)
+				effect_activation_phase()
 				pass
 			Phase.JUDGEMENT:
 				var s = "JUDGEMENT PHASE"
@@ -222,10 +243,11 @@ func set_character_phase(input, caller):
 			var selected_card_no = GlobalData.player_hand[int(input)]
 			player_field.append([selected_card_no])
 			player_field_vis.append(false)
+			player_field_mod.append(0)
 			GlobalData.player_hand.pop_at(input)
 			print(player_field, opp_field)
 			emit_signal("hand_changed", "player", GlobalData.player_hand)
-			emit_signal("field_changed", "player", player_field, player_field_vis)
+			emit_signal("field_changed", "player", player_field, player_field_vis, player_field_mod)
 			action_buttons_hide()
 			if len(player_field) == current_round + 1 and len(player_field) == len(opp_field):
 				set_phase(Phase.LEVEL_UP)
@@ -236,9 +258,10 @@ func set_character_phase(input, caller):
 			var selected_card_no = GlobalData.opp_hand[int(input)]
 			opp_field.append([selected_card_no])
 			opp_field_vis.append(false)
+			opp_field_mod.append(0)
 			GlobalData.opp_hand.pop_at(input)
 			emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
-			emit_signal("field_changed", "opponent", opp_field, opp_field_vis)
+			emit_signal("field_changed", "opponent", opp_field, opp_field_vis, opp_field_mod)
 			action_buttons_hide()
 			if len(player_field) == current_round + 1 and len(player_field) == len(opp_field):
 				set_phase(Phase.LEVEL_UP)
@@ -325,14 +348,41 @@ func level_phase_highlight(selected):
 	
 @rpc("any_peer", "reliable")
 func open_phase():
-	for vis in [player_field_vis, opp_field_vis]:
+	for vis in [[player_field_vis, player_action_queue], [opp_field_vis, opp_action_queue]]:
 		for i in range(0,player_field_vis.size()):
-			vis[i] = true
+			# If card is being turned face up add it to action queue (ActionQueue will determine if it has an ability)
+			if vis[0] == false:
+				player_action_queue.append(player_field[i][0]) 
+			vis[0][i] = true # Sets vis to true
+			
 	$PlayerField.flip_all_face_up()
 	$OppField.flip_all_face_up()
 	for field in [$PlayerField, $OppField]:
 		for wrapper in field.get_children():
 			wrapper.get_child(0).card_hovered.connect(_preview_card)
+	
+	# TODO: Handle Enters Effects
+	# Send all the data to the actionqueue object to help 
+	
+func open_phase_end():
+	'''Will get connected to signals from ActionQueue/CancelButton for when the open phase is complete'''
+	if multiplayer.is_server():
+		set_phase(Phase.EFFECT_ACTIVATION)
+		
+func effect_activation_phase():
+	# TODO: Handle Activate Effects
+	# Clear Action Queues
+	player_action_queue = []
+	opp_action_queue = []
+	# Put all field cards into action queue (ActionQueue will determine which ones activate)
+	player_action_queue = player_field.map(func(n): return n[0])
+	opp_action_queue = opp_field.map(func(n): return n[0])
+	
+	# TODO Add Scene to ActionQueue
+
+func effect_activation_phase_end():
+	'''Will get connected to signals from ActionQueue/CancelButton for when the effect activation phase is complete'''
+
 	if multiplayer.is_server():
 		set_phase(Phase.JUDGEMENT)
 
@@ -449,14 +499,14 @@ func _hand_changed_emitted(player, hand):
 		update_hand(player, hand)
 		rpc("update_hand", "player", hand)
 	
-func _field_changed_emitted(player, field, field_vis):
+func _field_changed_emitted(player, field, field_vis, field_mod):
 	'''Process RPC for field updates'''
 	if player == "player":
-		update_field(player, field, field_vis)
-		rpc("update_field", "opponent", field, field_vis)
+		update_field(player, field, field_vis, field_mod)
+		rpc("update_field", "opponent", field, field_vis, field_mod)
 	if player == "opponent":
-		update_field(player, field, field_vis)
-		rpc("update_field", "player", field, field_vis)
+		update_field(player, field, field_vis, field_mod)
+		rpc("update_field", "player", field, field_vis, field_mod)
 
 @rpc("any_peer", "reliable")
 func update_hand(player, hand):
@@ -480,13 +530,13 @@ func update_hand(player, hand):
 		$OppHand.queue_redraw()
 
 @rpc("any_peer", "reliable")
-func update_field(player, field, field_vis):
+func update_field(player, field, field_vis, field_mod):
 	if player == "player":
-		$PlayerField.visualize(field, field_vis)
+		$PlayerField.visualize(field, field_vis, field_mod)
 		for ind in range(0, field_vis.size()):
 			$PlayerField.get_child(ind).get_child(0).card_hovered.connect(_preview_card)
 	else: #If player is opponent
-		$OppField.visualize(field, field_vis)
+		$OppField.visualize(field, field_vis, field_mod)
 		for ind in range(0, field_vis.size()):
 			if field_vis[ind]:
 				$OppField.get_child(ind).get_child(0).card_hovered.connect(_preview_card)
@@ -853,7 +903,7 @@ func highlight_clicked_rpc(caller, selected_ind, selected_card, clicked_index, c
 		GlobalData.player_hand.pop_at(selected_ind)
 		
 		emit_signal("hand_changed", "player", GlobalData.player_hand)
-		emit_signal("field_changed", "player", player_field, player_field_vis)
+		emit_signal("field_changed", "player", player_field, player_field_vis, player_field_mod)
 		level_up_phase_rpc()
 		
 	elif caller == 'client':
@@ -866,7 +916,7 @@ func highlight_clicked_rpc(caller, selected_ind, selected_card, clicked_index, c
 		GlobalData.opp_hand.pop_at(selected_ind)
 		
 		emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
-		emit_signal("field_changed", "opponent", opp_field, opp_field_vis)
+		emit_signal("field_changed", "opponent", opp_field, opp_field_vis, opp_field_mod)
 		rpc("level_up_phase_rpc")
 	
 	

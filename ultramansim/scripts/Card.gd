@@ -125,6 +125,10 @@ func _ready() -> void:
 	self.face_up = true
 	pass # Replace with function body.
 
+func add_power(power):
+	self.curr_power = power + self.curr_power
+	self._update_power_text(self.curr_power)
+
 func _update_power_text(power: int):
 	var formatted_string = "[center]" + str(power/1000) + ",000" + "[/center]"
 	$Power.set_text(formatted_string)

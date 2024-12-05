@@ -261,3 +261,75 @@ offset_top = 410.0
 offset_right = 682.0
 offset_bottom = 430.0
 theme_override_styles/normal = SubResource("StyleBoxFlat_pw32g")
+
+[node name="Action_control" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ActionQueue" type="Control" parent="Action_control"]
+visible = false
+anchors_preset = 0
+offset_left = 7.0
+offset_top = 155.0
+offset_right = 305.0
+offset_bottom = 473.0
+
+[node name="ColorRect" type="ColorRect" parent="Action_control/ActionQueue"]
+layout_mode = 0
+offset_left = -9.0
+offset_top = -32.0
+offset_right = 261.0
+offset_bottom = 353.0
+color = Color(0.309804, 0.243137, 0.266667, 1)
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Action_control/ActionQueue"]
+layout_mode = 2
+offset_top = -28.0
+offset_right = 255.0
+offset_bottom = -2.0
+text = "ACTION QUEUE"
+
+[node name="ItemList" type="ItemList" parent="Action_control/ActionQueue"]
+layout_mode = 2
+offset_right = 255.0
+offset_bottom = 262.0
+size_flags_vertical = 3
+
+[node name="ActionActivateButton" type="Button" parent="Action_control/ActionQueue"]
+layout_mode = 2
+offset_left = -1.0
+offset_top = 267.0
+offset_right = 254.0
+offset_bottom = 345.0
+size_flags_vertical = 3
+text = "ACTIVATE"
+
+[node name="CardSelector" type="Control" parent="Action_control"]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ColorRect" type="ColorRect" parent="Action_control/CardSelector"]
+layout_mode = 0
+offset_left = 263.0
+offset_top = 6.0
+offset_right = 883.0
+offset_bottom = 127.0
+color = Color(0.591459, 0.740546, 0.999684, 1)
+
+[node name="ItemList" type="ItemList" parent="Action_control/CardSelector"]
+layout_mode = 0
+offset_left = 276.0
+offset_top = 10.0
+offset_right = 779.0
+offset_bottom = 124.0
+
+[node name="Button" type="Button" parent="Action_control/CardSelector"]
+layout_mode = 0
+offset_left = 797.0
+offset_top = 38.0
+offset_right = 875.0
+offset_bottom = 86.0
+text = "Select"
