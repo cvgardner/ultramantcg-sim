@@ -29,6 +29,7 @@ var player_game_data = {
 	"field": player_field,
 	"field_vis": player_field_vis,
 	"field_mod": player_field_mod,
+	"action_queue": player_action_queue,
 	"hand": GlobalData.player_hand,
 	"deck": GlobalData.player_deck.deck
 }
@@ -38,6 +39,7 @@ var opp_game_data = {
 	"field": opp_field,
 	"field_vis": opp_field_vis,
 	"field_mod": opp_field_mod,
+	"action_queue": opp_action_queue,
 	"hand": GlobalData.opp_hand,
 	"deck": GlobalData.opp_deck.deck
 }
@@ -57,6 +59,9 @@ signal hand_changed(player, hand)
 signal field_changed(player, field, field_vis, field_mod)
 signal start_mulligan
 signal rematch_requested()
+signal open_phase_ability(player_game_data, opp_game_data)
+signal activate_phase_ability(player_game_data, opp_game_data)
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if local_test:
@@ -350,8 +355,8 @@ func level_phase_highlight(selected):
 func open_phase():
 	for vis in [[player_field_vis, player_action_queue], [opp_field_vis, opp_action_queue]]:
 		for i in range(0,player_field_vis.size()):
-			# If card is being turned face up add it to action queue (ActionQueue will determine if it has an ability)
-			if vis[0] == false:
+			# If card is being turned face up add its first ability is trigger = 'ENTER_PLAY'
+			if vis[0] == false and GlobalData.cards[player_field[i]].abilities[0]["trigger"] == 'ENTER_PLAY': # TODO update with multi abilities when they are released
 				player_action_queue.append(player_field[i][0]) 
 			vis[0][i] = true # Sets vis to true
 			
@@ -362,7 +367,8 @@ func open_phase():
 			wrapper.get_child(0).card_hovered.connect(_preview_card)
 	
 	# TODO: Handle Enters Effects
-	# Send all the data to the actionqueue object to help 
+	# Send all the data to the actionqueue object to help
+	$ActionControl.process_enters_play(player_game_data, opp_game_data)
 	
 func open_phase_end():
 	'''Will get connected to signals from ActionQueue/CancelButton for when the open phase is complete'''
