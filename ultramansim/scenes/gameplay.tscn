@@ -1,14 +1,14 @@
 [gd_scene load_steps=13 format=3 uid="uid://mvdg5c7lay7c"]
 
 [ext_resource type="Script" path="res://scripts/gameplay.gd" id="1_fwix1"]
-[ext_resource type="Texture2D" uid="uid://dp0r2d64mkguf" path="res://images/assets/UltramanMat.png" id="1_kbc0e"]
-[ext_resource type="Texture2D" uid="uid://bymvcaq8vd6ee" path="res://images/assets/UltramanMat2.png" id="2_vy3aw"]
-[ext_resource type="Texture2D" uid="uid://pv6t32x48leg" path="res://images/assets/card_back.png" id="3_ld4pa"]
+[ext_resource type="Texture2D" uid="uid://beqkbj70sj4tq" path="res://images/assets/UltramanMat.png" id="1_kbc0e"]
+[ext_resource type="Texture2D" uid="uid://c1vj626i3gph4" path="res://images/assets/UltramanMat2.png" id="2_vy3aw"]
+[ext_resource type="Texture2D" uid="uid://btwj3t6vw720w" path="res://images/assets/card_back.png" id="3_ld4pa"]
 [ext_resource type="Texture2D" uid="uid://bngo215xvukho" path="res://images/cards/BP01-012.webp" id="4_wt1vk"]
 [ext_resource type="Script" path="res://scenes/custom_scene_button.gd" id="5_jiqh6"]
 [ext_resource type="Script" path="res://scripts/CustomItemList.gd" id="6_g88w0"]
 [ext_resource type="Script" path="res://scripts/field_area.gd" id="8_42txr"]
-[ext_resource type="Texture2D" uid="uid://cg1fg42fb5ok1" path="res://images/assets/youwin.png" id="9_5abwo"]
+[ext_resource type="Texture2D" uid="uid://digu2haoestcq" path="res://images/assets/youwin.png" id="9_5abwo"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jusy4"]
 bg_color = Color(0.180392, 0.180392, 0.180392, 1)
@@ -262,12 +262,12 @@ offset_right = 682.0
 offset_bottom = 430.0
 theme_override_styles/normal = SubResource("StyleBoxFlat_pw32g")
 
-[node name="Action_control" type="Control" parent="."]
+[node name="ActionControl" type="Control" parent="."]
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="ActionQueue" type="Control" parent="Action_control"]
+[node name="ActionQueue" type="Control" parent="ActionControl"]
 visible = false
 anchors_preset = 0
 offset_left = 7.0
@@ -275,7 +275,7 @@ offset_top = 155.0
 offset_right = 305.0
 offset_bottom = 473.0
 
-[node name="ColorRect" type="ColorRect" parent="Action_control/ActionQueue"]
+[node name="ColorRect" type="ColorRect" parent="ActionControl/ActionQueue"]
 layout_mode = 0
 offset_left = -9.0
 offset_top = -32.0
@@ -283,20 +283,20 @@ offset_right = 261.0
 offset_bottom = 353.0
 color = Color(0.309804, 0.243137, 0.266667, 1)
 
-[node name="RichTextLabel" type="RichTextLabel" parent="Action_control/ActionQueue"]
+[node name="RichTextLabel" type="RichTextLabel" parent="ActionControl/ActionQueue"]
 layout_mode = 2
 offset_top = -28.0
 offset_right = 255.0
 offset_bottom = -2.0
 text = "ACTION QUEUE"
 
-[node name="ItemList" type="ItemList" parent="Action_control/ActionQueue"]
+[node name="ItemList" type="ItemList" parent="ActionControl/ActionQueue"]
 layout_mode = 2
 offset_right = 255.0
 offset_bottom = 262.0
 size_flags_vertical = 3
 
-[node name="ActionActivateButton" type="Button" parent="Action_control/ActionQueue"]
+[node name="ActionActivateButton" type="Button" parent="ActionControl/ActionQueue"]
 layout_mode = 2
 offset_left = -1.0
 offset_top = 267.0
@@ -305,13 +305,13 @@ offset_bottom = 345.0
 size_flags_vertical = 3
 text = "ACTIVATE"
 
-[node name="CardSelector" type="Control" parent="Action_control"]
+[node name="CardSelector" type="Control" parent="ActionControl"]
 visible = false
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="ColorRect" type="ColorRect" parent="Action_control/CardSelector"]
+[node name="ColorRect" type="ColorRect" parent="ActionControl/CardSelector"]
 layout_mode = 0
 offset_left = 263.0
 offset_top = 6.0
@@ -319,14 +319,14 @@ offset_right = 883.0
 offset_bottom = 127.0
 color = Color(0.591459, 0.740546, 0.999684, 1)
 
-[node name="ItemList" type="ItemList" parent="Action_control/CardSelector"]
+[node name="ItemList" type="ItemList" parent="ActionControl/CardSelector"]
 layout_mode = 0
 offset_left = 276.0
 offset_top = 10.0
 offset_right = 779.0
 offset_bottom = 124.0
 
-[node name="Button" type="Button" parent="Action_control/CardSelector"]
+[node name="Button" type="Button" parent="ActionControl/CardSelector"]
 layout_mode = 0
 offset_left = 797.0
 offset_top = 38.0

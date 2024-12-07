@@ -22,6 +22,7 @@ var level_up_complete = [] # Keeps track of which players have completed the lev
 var can_level = [] # Array of indexes which can level
 var player_action_queue = []
 var opp_action_queue = []
+var open_actions_completed = [] #holds info about which players have finished open phase activation
 var player_field_mod = []
 var opp_field_mod = []
 
@@ -44,6 +45,11 @@ var opp_game_data = {
 	"deck": GlobalData.opp_deck.deck
 }
 
+var stack_map = {
+	1: "SINGLE",
+	2: "DOUBLE",
+	3: "TRIPLE"
+}
 
 # Battle Array is an int array containing the info about who won/lost
 # -1: Opponent Win, 0: Tie, 1: Player Win
@@ -353,11 +359,16 @@ func level_phase_highlight(selected):
 	
 @rpc("any_peer", "reliable")
 func open_phase():
+	player_action_queue = []
+	opp_action_queue = []
 	for vis in [[player_field_vis, player_action_queue], [opp_field_vis, opp_action_queue]]:
 		for i in range(0,player_field_vis.size()):
-			# If card is being turned face up add its first ability is trigger = 'ENTER_PLAY'
-			if vis[0] == false and GlobalData.cards[player_field[i]].abilities[0]["trigger"] == 'ENTER_PLAY': # TODO update with multi abilities when they are released
-				player_action_queue.append(player_field[i][0]) 
+			# If card is being turned face up add its first ability is trigger = 'ENTER_PLAY' and stack_condition is met
+			if (vis[0] == false 
+			and GlobalData.cards[vis[0][i]].abilities[0]["trigger"] == 'ENTER_PLAY'
+			and stack_map[vis[0][i]] in GlobalData.cards[vis[0][i]].abilities[0]["stack_condition"]
+			): # TODO update with multi abilities when they are released
+				vis[1].append(vis[0][i][0]) 
 			vis[0][i] = true # Sets vis to true
 			
 	$PlayerField.flip_all_face_up()
@@ -368,12 +379,44 @@ func open_phase():
 	
 	# TODO: Handle Enters Effects
 	# Send all the data to the actionqueue object to help
-	$ActionControl.process_enters_play(player_game_data, opp_game_data)
+	if is_lead:
+		open_phase_action_ui('init', player_action_queue)
+	else:
+		rpc("open_phase_action_ui", 'init', opp_action_queue)
 	
-func open_phase_end():
-	'''Will get connected to signals from ActionQueue/CancelButton for when the open phase is complete'''
-	if multiplayer.is_server():
+@rpc('any_peer', 'reliable')
+func open_phase_action_ui(input, action_queue):
+	"handles UI for open phase ability activation and closure"
+	if input == 'init':
+		cancel_button.text = "No Effects"
+		action_buttons_show()
+		$ActionButtonContainer/ActionButton.hide()
+		
+		# TODO pass action_queue to the $ActionControl
+		print(action_queue)
+		$ActionControl.show()
+		
+	elif input == 'finished':
+		$ActionButtonContainer/ActionButton.show()
+		action_buttons_hide()
+		$ActionControl.hide()
+
+@rpc("any_peer",'reliable')	
+func open_phase_action_end(input):
+	'''Server based func to count which players have finish completing actions'''
+	open_actions_completed.append(input)
+	
+	
+	
+	if open_actions_completed.size() >= 2: #If all players are done reset open_actions_completed and change phase
+		open_actions_completed = []
 		set_phase(Phase.EFFECT_ACTIVATION)
+	elif input == 'server':
+		rpc("open_phase_action_ui", 'init', opp_action_queue)
+		pass
+	elif input == 'client':
+		open_phase_action_ui('init', player_action_queue)
+		pass
 		
 func effect_activation_phase():
 	# TODO: Handle Activate Effects
@@ -692,6 +735,14 @@ func _cancel_button_pressed():
 			$ActionButtonContainer/ActionButton.show() #fix only having one button bug
 			current_phase = Phase.OPEN
 			rpc("level_up_phase", "server")
+			
+	elif cancel_button.text == 'No Effects' and current_phase == Phase.OPEN:
+		if multiplayer.is_server():
+			open_phase_action_ui('finished', [])
+			open_phase_action_end('server')
+		else:
+			open_phase_action_ui("finished", [])
+			rpc("open_phase_action_end", "client")
 	
 @rpc("any_peer", "reliable")
 func set_lead_player(boolean):
