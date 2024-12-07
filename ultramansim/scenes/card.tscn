@@ -1,10 +1,10 @@
 [gd_scene load_steps=6 format=3 uid="uid://d1xswdoe8x7gl"]
 
 [ext_resource type="Script" path="res://scripts/Card.gd" id="1_mov5g"]
-[ext_resource type="Texture2D" uid="uid://pv6t32x48leg" path="res://images/assets/card_back.png" id="2_6peeh"]
-[ext_resource type="Texture2D" uid="uid://bytides6pek4t" path="res://images/assets/highlight.png" id="2_6tgyd"]
-[ext_resource type="Texture2D" uid="uid://ds4kkx6jrigu5" path="res://images/assets/SINGLE.png" id="3_rsri4"]
-[ext_resource type="Texture2D" uid="uid://rx2p7sh06nrc" path="res://images/assets/level_1.png" id="4_poptm"]
+[ext_resource type="Texture2D" uid="uid://btwj3t6vw720w" path="res://images/assets/card_back.png" id="2_6peeh"]
+[ext_resource type="Texture2D" uid="uid://c1pckpmqs7j5s" path="res://images/assets/highlight.png" id="2_6tgyd"]
+[ext_resource type="Texture2D" uid="uid://dofscoj2gp0ae" path="res://images/assets/SINGLE.png" id="3_rsri4"]
+[ext_resource type="Texture2D" uid="uid://dlohb7t6oerw2" path="res://images/assets/level_1.png" id="4_poptm"]
 
 [node name="card" type="Control"]
 custom_minimum_size = Vector2(50, 75)

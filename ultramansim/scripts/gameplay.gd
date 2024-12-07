@@ -156,7 +156,6 @@ func _on_phase_changed(new_phase: Phase):
 				var s = "OPEN PHASE"
 				update_battle_log(s)
 				open_phase()
-				rpc("open_phase")
 				pass
 			Phase.EFFECT_ACTIVATION:
 				var s = "EFFECT ACTIVATION PHASE"
@@ -361,28 +360,37 @@ func level_phase_highlight(selected):
 func open_phase():
 	player_action_queue = []
 	opp_action_queue = []
-	for vis in [[player_field_vis, player_action_queue], [opp_field_vis, opp_action_queue]]:
+	# TODO update everything with game_data instead of a list of the elements
+	for game_data in [player_game_data, opp_game_data]:
+	# [[player_field_vis, player_action_queue], [opp_field_vis, opp_action_queue]]:
+		print(game_data)
 		for i in range(0,player_field_vis.size()):
+			print(GlobalData.cards[game_data['field'][i][0]].abilities)
 			# If card is being turned face up add its first ability is trigger = 'ENTER_PLAY' and stack_condition is met
-			if (vis[0] == false 
-			and GlobalData.cards[vis[0][i]].abilities[0]["trigger"] == 'ENTER_PLAY'
-			and stack_map[vis[0][i]] in GlobalData.cards[vis[0][i]].abilities[0]["stack_condition"]
-			): # TODO update with multi abilities when they are released
-				vis[1].append(vis[0][i][0]) 
-			vis[0][i] = true # Sets vis to true
+			if (game_data["field_vis"][i] == false and GlobalData.cards[game_data['field'][i][0]]['abilities'].size() > 0):
+				if (GlobalData.cards[game_data['field'][i][0]]['abilities'][0]["trigger"] == 'ENTER_PLAY'
+					and stack_map[game_data['field'][i].size()] in GlobalData.cards[game_data['field'][i][0]]['abilities'][0]["stack_condition"]
+				): # TODO update with multi abilities when they are released
+					game_data['action_queue'].append(game_data['field'][i][0]) 
+			game_data['field_vis'][i] = true # Sets vis to true
 			
+	open_phase_rpc()
+	rpc("open_phase_rpc")
+	
+	# TODO: Handle Enters Effects
+	# Send all the data to the actionqueue object to help
+	if is_lead:
+		open_phase_action_ui('init', player_game_data['action_queue'])
+	else:
+		rpc("open_phase_action_ui", 'init', opp_game_data['action_queue'])
+		
+@rpc("any_peer", "reliable")
+func open_phase_rpc():
 	$PlayerField.flip_all_face_up()
 	$OppField.flip_all_face_up()
 	for field in [$PlayerField, $OppField]:
 		for wrapper in field.get_children():
 			wrapper.get_child(0).card_hovered.connect(_preview_card)
-	
-	# TODO: Handle Enters Effects
-	# Send all the data to the actionqueue object to help
-	if is_lead:
-		open_phase_action_ui('init', player_action_queue)
-	else:
-		rpc("open_phase_action_ui", 'init', opp_action_queue)
 	
 @rpc('any_peer', 'reliable')
 func open_phase_action_ui(input, action_queue):
@@ -394,12 +402,13 @@ func open_phase_action_ui(input, action_queue):
 		
 		# TODO pass action_queue to the $ActionControl
 		print(action_queue)
-		$ActionControl.show()
+		$ActionControl/ActionQueue.show()
 		
 	elif input == 'finished':
 		$ActionButtonContainer/ActionButton.show()
 		action_buttons_hide()
-		$ActionControl.hide()
+		$ActionControl/ActionQueue.hide()
+		
 
 @rpc("any_peer",'reliable')	
 func open_phase_action_end(input):
@@ -428,6 +437,8 @@ func effect_activation_phase():
 	opp_action_queue = opp_field.map(func(n): return n[0])
 	
 	# TODO Add Scene to ActionQueue
+	
+	effect_activation_phase_end()
 
 func effect_activation_phase_end():
 	'''Will get connected to signals from ActionQueue/CancelButton for when the effect activation phase is complete'''
