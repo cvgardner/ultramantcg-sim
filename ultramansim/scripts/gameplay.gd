@@ -22,9 +22,10 @@ var level_up_complete = [] # Keeps track of which players have completed the lev
 var can_level = [] # Array of indexes which can level
 var player_action_queue = []
 var opp_action_queue = []
-var open_actions_completed = [] #holds info about which players have finished open phase activation
 var player_field_mod = []
 var opp_field_mod = []
+var open_actions_completed = [] #holds info about which players have finished open phase activation
+var activate_actions_completed = []
 
 var player_game_data = {
 	"field": player_field,
@@ -32,7 +33,8 @@ var player_game_data = {
 	"field_mod": player_field_mod,
 	"action_queue": player_action_queue,
 	"hand": GlobalData.player_hand,
-	"deck": GlobalData.player_deck.deck
+	"deck": GlobalData.player_deck.deck,
+	"scene_owner": false
 }
 
 
@@ -42,7 +44,8 @@ var opp_game_data = {
 	"field_mod": opp_field_mod,
 	"action_queue": opp_action_queue,
 	"hand": GlobalData.opp_hand,
-	"deck": GlobalData.opp_deck.deck
+	"deck": GlobalData.opp_deck.deck,
+	"scene_owner": false
 }
 
 var stack_map = {
@@ -135,9 +138,9 @@ func _on_phase_changed(new_phase: Phase):
 				var s = "Lead Player Setting Scene"
 				update_battle_log(s)
 				if is_lead:
-					set_scene_phase("init")
+					set_scene_phase("init", '')
 				else:
-					rpc("set_scene_phase", "init")
+					rpc("set_scene_phase", "init", '')
 				pass
 			Phase.SET_CHARACTER:
 				var s = "SET CHARACTER PHASE"
@@ -197,7 +200,7 @@ func draw_phase():
 	set_phase(Phase.LEAD_SCENE_SET)
 	
 @rpc("any_peer", "reliable")
-func set_scene_phase(input):
+func set_scene_phase(input, owner):
 	if str(input) == "init":
 		action_button.text = "Set Scene"
 		cancel_button.text = "Cancel"
@@ -209,22 +212,33 @@ func set_scene_phase(input):
 		GlobalData.player_hand.pop_at(input)
 		GlobalData.player_hand = GlobalData.player_hand + GlobalData.player_deck.draw_card(1)
 		emit_signal("hand_changed", "player", GlobalData.player_hand)
+		player_game_data['scene_owner'] = true
+		if GlobalData.cards[selected_card_no].abilities.size() > 0:
+			if GlobalData.cards[selected_card_no].abiliaties[0].trigger == 'ENTER_PLAY':
+				$ActionControl.process_scene_enters_effects(selected_card_no) 	#Process Scene Enters Ability
+		else:
+			set_scene_phase_end()
+
 	elif not is_lead:
 		var selected_card_no = GlobalData.opp_hand[int(input)]
 		set_scene_ui(selected_card_no)
 		rpc("set_scene_ui", selected_card_no)
 		GlobalData.opp_hand.pop_at(input)
+		opp_game_data['scene_owner'] = true
 		GlobalData.opp_hand = GlobalData.opp_hand + GlobalData.opp_deck.draw_card(1)
 		emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
-		
-		
-	if str(input) != "init":
-		action_buttons_hide()
-		if is_lead:
-			set_phase(Phase.SET_CHARACTER)
+		if GlobalData.cards[selected_card_no].abilities.size() > 0:
+			if GlobalData.cards[selected_card_no].abiliaties[0].trigger == 'ENTER_PLAY':
+				$ActionControl.process_scene_enters_effects(selected_card_no) 	#Process Scene Enters Ability
 		else:
-			rpc("set_phase", Phase.SET_CHARACTER)
-		
+			set_scene_phase_end()
+
+func set_scene_phase_end():
+	action_buttons_hide()
+	if is_lead:
+		set_phase(Phase.SET_CHARACTER)
+	else:
+		rpc("set_phase", Phase.SET_CHARACTER)
 		
 @rpc("any_peer", "reliable")
 func set_scene_ui(selected_card_no):
@@ -386,6 +400,10 @@ func open_phase():
 		
 @rpc("any_peer", "reliable")
 func open_phase_rpc():
+	#Undisable all cards in hand from after level ups
+	for i in range($PlayerHand.get_item_count()):
+		$PlayerHand.set_item_disabled(i, false)
+	
 	$PlayerField.flip_all_face_up()
 	$OppField.flip_all_face_up()
 	for field in [$PlayerField, $OppField]:
@@ -396,6 +414,8 @@ func open_phase_rpc():
 func open_phase_action_ui(input, action_queue):
 	"handles UI for open phase ability activation and closure"
 	if input == 'init':
+		if multiplayer.is_server() == false:
+			current_phase = Phase.OPEN
 		cancel_button.text = "No Effects"
 		action_buttons_show()
 		$ActionButtonContainer/ActionButton.hide()
@@ -415,36 +435,65 @@ func open_phase_action_end(input):
 	'''Server based func to count which players have finish completing actions'''
 	open_actions_completed.append(input)
 	
-	
-	
 	if open_actions_completed.size() >= 2: #If all players are done reset open_actions_completed and change phase
 		open_actions_completed = []
 		set_phase(Phase.EFFECT_ACTIVATION)
 	elif input == 'server':
 		rpc("open_phase_action_ui", 'init', opp_action_queue)
-		pass
 	elif input == 'client':
 		open_phase_action_ui('init', player_action_queue)
-		pass
 		
 func effect_activation_phase():
 	# TODO: Handle Activate Effects
 	# Clear Action Queues
 	player_action_queue = []
 	opp_action_queue = []
-	# Put all field cards into action queue (ActionQueue will determine which ones activate)
+	# Put all field cards into action_queue that have trigger: ACTIVATE
 	player_action_queue = player_field.map(func(n): return n[0])
 	opp_action_queue = opp_field.map(func(n): return n[0])
 	
 	# TODO Add Scene to ActionQueue
 	
-	effect_activation_phase_end()
-
-func effect_activation_phase_end():
+	
+	
+	if is_lead:
+		effect_activation_phase_ui('init', player_game_data['action_queue'])
+	else:
+		rpc("effect_activation_phase_ui", 'init', opp_game_data['action_queue'])
+		
+@rpc('any_peer', 'reliable')
+func effect_activation_phase_ui(input, action_queue):
+	"handles UI for open phase ability activation and closure"
+	if input == 'init':
+		if multiplayer.is_server() == false:
+			current_phase = Phase.EFFECT_ACTIVATION
+		cancel_button.text = "No Effects"
+		action_buttons_show()
+		$ActionButtonContainer/ActionButton.hide()
+		
+		# TODO pass action_queue to the $ActionControl
+		print(action_queue)
+		$ActionControl/ActionQueue.show()
+		
+	elif input == 'finished':
+		$ActionButtonContainer/ActionButton.show()
+		action_buttons_hide()
+		$ActionControl/ActionQueue.hide()
+		
+@rpc("any_peer", 'reliable')
+func effect_activation_phase_end(input):
 	'''Will get connected to signals from ActionQueue/CancelButton for when the effect activation phase is complete'''
-
-	if multiplayer.is_server():
+	activate_actions_completed.append(input)
+	
+	if activate_actions_completed.size() >= 2: #If all players are done reset open_actions_completed and change phase
+		activate_actions_completed = []
 		set_phase(Phase.JUDGEMENT)
+	elif input == 'server':
+		rpc("effect_activation_phase_ui", 'init', opp_action_queue)
+	elif input == 'client':
+		effect_activation_phase_ui('init', player_action_queue)
+		
+
 
 func judgement_phase():
 	var player_wins = 0
@@ -578,7 +627,6 @@ func update_hand(player, hand):
 			$PlayerHand.add_item("", GlobalData.cards[card].image)
 			$PlayerHand.set_item_metadata(index, card)
 			index += 1
-			
 		$PlayerHand.queue_redraw()
 	else: # If player is opponent
 		$OppHand.clear()
@@ -686,9 +734,9 @@ func _action_button_pressed():
 			var selected_item_index = $PlayerHand.get_selected_items()[0]
 			var selected_card = GlobalData.cards[$PlayerHand.get_item_metadata(selected_item_index)]
 			if multiplayer.is_server() and selected_card.feature == "Scene" and selected_card.level <= current_round:
-				set_scene_phase(selected_item_index)
-			elif selected_card.feature == "Scene" and selected_card.level == current_round:
-				rpc("set_scene_phase", selected_item_index)
+				set_scene_phase(selected_item_index, 'Server')
+			elif selected_card.feature == "Scene" and selected_card.level <= current_round:
+				rpc("set_scene_phase", selected_item_index, 'Client')
 			
 	elif action_button.text == "Set Character":
 		if len($PlayerHand.get_selected_items()) > 0:
@@ -754,6 +802,14 @@ func _cancel_button_pressed():
 		else:
 			open_phase_action_ui("finished", [])
 			rpc("open_phase_action_end", "client")
+			
+	elif cancel_button.text == 'No Effects' and current_phase == Phase.EFFECT_ACTIVATION:
+		if multiplayer.is_server():
+			effect_activation_phase_ui('finished', [])
+			effect_activation_phase_end('server')
+		else:
+			effect_activation_phase_ui("finished", [])
+			rpc("effect_activation_phase_end", "client")
 	
 @rpc("any_peer", "reliable")
 func set_lead_player(boolean):
