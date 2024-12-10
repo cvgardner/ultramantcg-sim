@@ -70,7 +70,12 @@ func visualize(field, field_vis, field_mod):
 		new_card.change_stack(stack_map[field[i].size()])
 		if not field_vis[i]:
 			new_card.flip_face_down()
-		new_card.add_power(field_mod[i])
+			
+		#Continuous Effects Activated
+		
+		#Modify BP and power based on field_mod
+		#new_card.add_power(field_mod[i])
+		
 		i += 1
 		
 func _on_item_mouse_entered(card_no):
@@ -87,7 +92,6 @@ func _on_child_gui_input(event, wrapper):
 		var index = self.get_children().find(wrapper)
 		print("highlighted ", index)
 		emit_signal("item_clicked", index)
-		
 		
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.

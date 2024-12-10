@@ -21,8 +21,17 @@ var curr_power : int
 var curr_type : String
 var image_path_card_back = "res://images/assets/card_back.png"
 var face_up : bool
+var stack_map = {
+	1: "SINGLE",
+	2: "DOUBLE",
+	3: "TRIPLE"
+}
 
 signal card_hovered(card_no)
+signal card_clicked(card_no)
+signal card_enter_play(card_no)
+signal card_scene_set(card_no)
+signal card_trigger()
 
 func _init( card_name:= "Ultraman Dyna, Flash Type",
  card_no:= "SD01-001",
@@ -124,6 +133,21 @@ func _ready() -> void:
 	self.mouse_entered.connect(_on_mouse_entered)
 	self.face_up = true
 	pass # Replace with function body.
+	
+func bp_change(mod):
+	''' Increases or decreases power based on the input mod which is 
+	positive or negative whole number or str "EXTRA" '''
+	var bp_int = 0
+	match self.curr_stack:
+		"SINGLE":
+			bp_int = 1
+		"DOUBLE":
+			bp_int = 2
+		"TRIPLE":
+			bp_int = 3
+	var new_bp = stack_map[bp_int+mod]
+	self.curr_power = self.bp[new_bp]
+	self._update_power_text(self.curr_power)
 
 func add_power(power):
 	self.curr_power = power + self.curr_power

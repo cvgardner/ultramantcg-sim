@@ -642,12 +642,19 @@ func update_field(player, field, field_vis, field_mod):
 	if player == "player":
 		$PlayerField.visualize(field, field_vis, field_mod)
 		for ind in range(0, field_vis.size()):
-			$PlayerField.get_child(ind).get_child(0).card_hovered.connect(_preview_card)
+			var card = $PlayerField.get_child(ind).get_child(0)
+			card.card_hovered.connect(_preview_card)
+			card.bp_change(field_mod["bp"])
+			card.add_power(field_mod["power"])
+			
 	else: #If player is opponent
 		$OppField.visualize(field, field_vis, field_mod)
 		for ind in range(0, field_vis.size()):
 			if field_vis[ind]:
-				$OppField.get_child(ind).get_child(0).card_hovered.connect(_preview_card)
+				var card = $OppField.get_child(ind).get_child(0)
+				card.card_hovered.connect(_preview_card)
+				card.bp_change(field_mod["bp"])
+				card.add_power(field_mod["power"])
 
 
 @rpc("any_peer", "reliable")
@@ -999,19 +1006,19 @@ func highlight_clicked(clicked_index):
 	'''Processes level up logic when clicking a card that satisfies the level up'''
 	if current_phase != Phase.LEVEL_UP: #Skip code if its not the level up phase
 		return
-
-	var selected_ind = $PlayerHand.get_selected_items()[0]
-	var selected_card = GlobalData.cards[$PlayerHand.get_item_metadata(selected_ind)]
-	print("Clicked Index: ", clicked_index)
-	var clicked_wrapper = $PlayerField.get_child(clicked_index)
-	var clicked_card = clicked_wrapper.get_child(0)
-	
-	if selected_card.character == clicked_card.character && selected_card.level - 1 == clicked_card.level && can_level[clicked_index]:
-		can_level[clicked_index] = false
-		if multiplayer.is_server():
-			highlight_clicked_rpc('server', selected_ind, selected_card.card_no, clicked_index, clicked_card)
-		else:
-			rpc("highlight_clicked_rpc", 'client', selected_ind, selected_card.card_no, clicked_index, clicked_card)
+	if $PlayerHand.get_selected_items().size() > 0:
+		var selected_ind = $PlayerHand.get_selected_items()[0]
+		var selected_card = GlobalData.cards[$PlayerHand.get_item_metadata(selected_ind)]
+		print("Clicked Index: ", clicked_index)
+		var clicked_wrapper = $PlayerField.get_child(clicked_index)
+		var clicked_card = clicked_wrapper.get_child(0)
+		
+		if selected_card.character == clicked_card.character && selected_card.level - 1 == clicked_card.level && can_level[clicked_index]:
+			can_level[clicked_index] = false
+			if multiplayer.is_server():
+				highlight_clicked_rpc('server', selected_ind, selected_card.card_no, clicked_index, clicked_card)
+			else:
+				rpc("highlight_clicked_rpc", 'client', selected_ind, selected_card.card_no, clicked_index, clicked_card)
 
 		
 @rpc("any_peer", "reliable")
