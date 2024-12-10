@@ -267,7 +267,7 @@ func set_character_phase(input, caller):
 			var selected_card_no = GlobalData.player_hand[int(input)]
 			player_field.append([selected_card_no])
 			player_field_vis.append(false)
-			player_field_mod.append({"power": 0, "bp": 0, "bp_cont": 0})
+			GlobalData.player_game_data['field_mod'].append({"power": {}, "bp": {}})
 			GlobalData.player_hand.pop_at(input)
 			print(player_field, opp_field)
 			emit_signal("hand_changed", "player", GlobalData.player_hand)
@@ -282,7 +282,7 @@ func set_character_phase(input, caller):
 			var selected_card_no = GlobalData.opp_hand[int(input)]
 			opp_field.append([selected_card_no])
 			opp_field_vis.append(false)
-			opp_field_mod.append({"power": 0, "bp": 0, "bp_cont": 0})
+			GlobalData.opp_game_data['field_mod'].append({"power": {}, "bp": {}})
 			GlobalData.opp_hand.pop_at(input)
 			emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
 			emit_signal("field_changed", "opponent", opp_field, opp_field_vis, opp_field_mod)
@@ -611,9 +611,7 @@ func _hand_changed_emitted(player, hand):
 func _field_changed_emitted(player, field, field_vis, field_mod):
 	'''Process RPC for field updates'''
 	# Process CONT effects before sending out updates
-	#var result = $ActionControl.update_cont_effects()
-	#player_field_mod = result['player_field_mod']
-	#opp_field_mod = result['opp_field_mod']
+
 	
 	if player == "player":
 		#Process cont effect everytime field is updated
