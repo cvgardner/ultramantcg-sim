@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://mvdg5c7lay7c"]
+[gd_scene load_steps=15 format=3 uid="uid://mvdg5c7lay7c"]
 
 [ext_resource type="Script" path="res://scripts/gameplay.gd" id="1_fwix1"]
 [ext_resource type="Texture2D" uid="uid://dp0r2d64mkguf" path="res://images/assets/UltramanMat.png" id="1_kbc0e"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://scripts/field_area.gd" id="8_42txr"]
 [ext_resource type="Texture2D" uid="uid://cg1fg42fb5ok1" path="res://images/assets/youwin.png" id="9_5abwo"]
 [ext_resource type="Script" path="res://scenes/action_queue.gd" id="10_0u4jc"]
+[ext_resource type="Script" path="res://scripts/action_control.gd" id="10_txq2j"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jusy4"]
 bg_color = Color(0.180392, 0.180392, 0.180392, 1)
@@ -267,6 +268,7 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_pw32g")
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+script = ExtResource("10_txq2j")
 
 [node name="ActionQueue" type="Control" parent="ActionControl"]
 visible = false

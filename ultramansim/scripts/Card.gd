@@ -137,6 +137,8 @@ func _ready() -> void:
 func bp_change(mod):
 	''' Increases or decreases power based on the input mod which is 
 	positive or negative whole number or str "EXTRA" '''
+	if mod == null:
+		return
 	var bp_int = 0
 	match self.curr_stack:
 		"SINGLE":
@@ -150,6 +152,8 @@ func bp_change(mod):
 	self._update_power_text(self.curr_power)
 
 func add_power(power):
+	if power == null:
+		return
 	self.curr_power = power + self.curr_power
 	self._update_power_text(self.curr_power)
 

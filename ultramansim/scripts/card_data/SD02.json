@@ -16,9 +16,15 @@
 			{
 				"trigger": "CONTINUOUS",
 				"stack_condition": ["SINGLE", "DOUBLE"],
+				"effect": [{
+					"SELF_BP_CHANGE_OPP_TYPE": {
+						"bp_mod": 1,
+						"type": ["SPEED", "ARMED"]
+					}
+				}],
                 "extra_condition": ["opponent_type_speed", "opponent_type_armed"],
 				"target": "SELF",
-				"effect": [{
+				"effect_old": [{
 					"BP_GRADE_UP": 1
 			}]
 			}

@@ -71,13 +71,15 @@ func visualize(field, field_vis, field_mod):
 		if not field_vis[i]:
 			new_card.flip_face_down()
 			
-		#Continuous Effects Activated
 		
 		#Modify BP and power based on field_mod
-		#new_card.add_power(field_mod[i])
+		new_card.bp_change(field_mod["bp"] + field_mod['bp_cont'])
+		new_card.add_power(field_mod["power"])
 		
 		i += 1
 		
+
+	
 func _on_item_mouse_entered(card_no):
 	emit_signal("item_hovered", card_no)
 
