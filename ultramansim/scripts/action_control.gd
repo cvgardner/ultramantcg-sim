@@ -1,18 +1,26 @@
 extends Control
 
 var action_queue = [] #Array holding all the current actions
-
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.
 
-func update_cont_effects(player_game_data, opp_game_data):
+func update_cont_effects():
 	'''
-	Takes the game state as input and returns the updated field_mod values based on processing cont effects
-	'''
-	var player_field_mod = player_game_data['field_mod']
-	var opp_field_mod = opp_game_data['field_mod']
-	return {"player_field_mod": player_field_mod, "opp_field_mod": opp_field_mod}
+	Processing cont effects and directly updates GlobalData game_data variables
+	'''	
+	for i in range(GlobalData.player_game_data['field_mod'].size()):
+		#Check for player cont
+		var player_card = GlobalData.cards[GlobalData.player_game_data['field'][i][0]]
+		if (player_card.abilities[0]['trigger'] == 'CONTINUOUS' 
+		and player_card.curr_stack in player_card.abilities[0]['stack_condition']):
+			pass
+		#Check for Opp cont
+		var opp_card = GlobalData.cards[GlobalData.opp_game_data['field'][i][0]]
+		if (opp_card.abilities[0]['trigger'] == 'CONTINUOUS' 
+		and opp_card.curr_stack in opp_card.abilities[0]['stack_condition']):
+			pass
+			
 
 
 func update_actionlist_ui():

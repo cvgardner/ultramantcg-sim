@@ -10,6 +10,31 @@ var player_hand = []
 var opp_hand = []
 var player_discard = []
 var opp_discard = []
+var player_game_data = {
+	"field": [], # Array of Arrays storing the card_no in the field
+	"field_vis": [], # Boolean Array showing what is faceup (true) and facedown (false)
+	"field_mod": [], # Array of Dict of Dict storing Power/BP modifiers and their origins (to prevent effect stacking)
+	"effect_queue": [], # List of card_no to help process effects
+	"hand": [], # Array of card_no representing hand of cards
+	"deck": Deck.new(), # Deck object
+	"scene_owner": false # Boolean representing if this player controls the scene
+}
+
+var opp_game_data = {
+	"field": [],
+	"field_vis": [],
+	"field_mod": [],
+	"action_queue": [],
+	"hand": [],
+	"deck": Deck.new(),
+	"scene_owner": false
+}
+
+var stack_map = {
+		1: "SINGLE",
+		2: "DOUBLE",
+		3: "TRIPLE"
+	}
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

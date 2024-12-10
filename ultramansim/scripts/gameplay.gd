@@ -214,7 +214,7 @@ func set_scene_phase(input, owner):
 		emit_signal("hand_changed", "player", GlobalData.player_hand)
 		player_game_data['scene_owner'] = true
 		if GlobalData.cards[selected_card_no].abilities.size() > 0:
-			if GlobalData.cards[selected_card_no].abiliaties[0].trigger == 'ENTER_PLAY':
+			if GlobalData.cards[selected_card_no].abilities[0]['trigger'] == 'ENTER_PLAY':
 				$ActionControl.process_scene_enters_effects(selected_card_no) 	#Process Scene Enters Ability
 		else:
 			set_scene_phase_end()
@@ -228,7 +228,7 @@ func set_scene_phase(input, owner):
 		GlobalData.opp_hand = GlobalData.opp_hand + GlobalData.opp_deck.draw_card(1)
 		emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
 		if GlobalData.cards[selected_card_no].abilities.size() > 0:
-			if GlobalData.cards[selected_card_no].abiliaties[0].trigger == 'ENTER_PLAY':
+			if GlobalData.cards[selected_card_no].abiliaties[0]['trigger'] == 'ENTER_PLAY':
 				$ActionControl.process_scene_enters_effects(selected_card_no) 	#Process Scene Enters Ability
 		else:
 			set_scene_phase_end()
@@ -611,9 +611,9 @@ func _hand_changed_emitted(player, hand):
 func _field_changed_emitted(player, field, field_vis, field_mod):
 	'''Process RPC for field updates'''
 	# Process CONT effects before sending out updates
-	var result = $ActionControl.update_cont_effects(player_game_data, opp_game_data)
-	player_field_mod = result['player_field_mod']
-	opp_field_mod = result['opp_field_mod']
+	#var result = $ActionControl.update_cont_effects()
+	#player_field_mod = result['player_field_mod']
+	#opp_field_mod = result['opp_field_mod']
 	
 	if player == "player":
 		#Process cont effect everytime field is updated

@@ -73,8 +73,7 @@ func visualize(field, field_vis, field_mod):
 			
 		
 		#Modify BP and power based on field_mod
-		new_card.bp_change(field_mod["bp"] + field_mod['bp_cont'])
-		new_card.add_power(field_mod["power"])
+		#new_card.add_power(field_mod["power"])
 		
 		i += 1
 		
