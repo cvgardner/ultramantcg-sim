@@ -137,19 +137,25 @@ func _ready() -> void:
 func bp_change(mod):
 	''' Increases or decreases power based on the input mod which is 
 	positive or negative whole number or str "EXTRA" '''
+	print(mod)
 	if mod == null:
 		return
-	var bp_int = 0
-	match self.curr_stack:
-		"SINGLE":
-			bp_int = 1
-		"DOUBLE":
-			bp_int = 2
-		"TRIPLE":
-			bp_int = 3
-	var new_bp = stack_map[bp_int+mod]
-	self.curr_power = self.bp[new_bp]
-	self._update_power_text(self.curr_power)
+	if typeof(mod) == TYPE_INT or typeof(mod) == TYPE_FLOAT:
+		var bp_int = 0
+		match self.curr_stack:
+			"SINGLE":
+				bp_int = 1
+			"DOUBLE":
+				bp_int = 2
+			"TRIPLE":
+				bp_int = 3
+		var new_bp = stack_map[int(bp_int+mod)]
+		print(new_bp)
+		self.curr_power = self.bp[new_bp]
+		self._update_power_text(self.curr_power)
+	elif typeof(mod) == TYPE_STRING:
+		self.curr_power = self.bp[mod]
+		self._update_power_text(self.curr_power)
 
 func add_power(power):
 	if power == null:
@@ -236,11 +242,8 @@ func change_stack(new_stack):
 	changes the curr_stack variable and then stack icon
 	input should be either  "SINGLE", "DOUBLE" or "TRIPLE"
 	'''
-	print("Stack Change: ", curr_stack, new_stack)
 	curr_stack = new_stack
-	print("New Stack Image: ", "res://images/assets/{0}.png".format([curr_stack]))
 	$Stack.texture = ResourceLoader.load("res://images/assets/{0}.png".format([curr_stack]))
-	print("Power Change: ", self.curr_power, self.bp[new_stack])
 	self.curr_power = self.bp[new_stack]
 	self._update_power_text(self.curr_power)
 

@@ -37,6 +37,8 @@ func visualize(field, field_vis, field_mod):
 	'''
 	Updates the visual in the hbox container based on the list 'data'
 	'''
+	if field_mod.size() < 1:
+		return
 	#Queue Free / Clear current items in hbox container
 	for child in self.get_children():
 		self.remove_child(child)
@@ -66,14 +68,28 @@ func visualize(field, field_vis, field_mod):
 		self.add_child(wrapper_node)		
 		
 		#update card (stack, vis, power)
-		print("Stack Size: ", field[i].size())
 		new_card.change_stack(stack_map[field[i].size()])
 		if not field_vis[i]:
 			new_card.flip_face_down()
 			
 		
 		#Modify BP and power based on field_mod
-		#new_card.add_power(field_mod["power"])
+		var new_bp = 0
+		if field_mod[i].get('bp_mod') != null:
+			for bp in field_mod[i].get('bp_mod').values():
+				if typeof(bp) == TYPE_INT or typeof(bp) == TYPE_FLOAT:
+					new_bp += bp
+				elif typeof(bp) == TYPE_STRING:
+					new_bp = bp
+					break
+			new_card.bp_change(new_bp)
+		
+		var power_mod = 0
+		if field_mod[i].get('power') != null:
+			for power in field_mod[i]['power'].values():
+				if typeof(power) == TYPE_INT:
+					power_mod += power
+			new_card.add_power(power_mod)
 		
 		i += 1
 		
@@ -91,7 +107,6 @@ func _on_child_gui_input(event, wrapper):
 	if event is InputEventMouseButton and event.pressed:
 		#var wrapper = event.target.get_parent()
 		var index = self.get_children().find(wrapper)
-		print("highlighted ", index)
 		emit_signal("item_clicked", index)
 		
 	

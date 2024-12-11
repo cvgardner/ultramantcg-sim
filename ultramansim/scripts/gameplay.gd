@@ -80,6 +80,9 @@ func _ready() -> void:
 		print(GlobalData.opp_deck.deckdict)
 		configure_local_test()
 		#Test Connection
+	
+	GlobalData.player_game_data = player_game_data
+	GlobalData.opp_game_data = opp_game_data
 		
 	# Connecting Signals
 	action_button.pressed.connect(_action_button_pressed)
@@ -189,7 +192,6 @@ func start_phase():
 	
 func draw_phase():
 	# Draw Phase
-	print(GlobalData.player_deck.draw_card(1))
 	GlobalData.player_hand = GlobalData.player_hand + GlobalData.player_deck.draw_card(1)
 	GlobalData.opp_hand = GlobalData.opp_hand + GlobalData.opp_deck.draw_card(1)
 
@@ -267,9 +269,8 @@ func set_character_phase(input, caller):
 			var selected_card_no = GlobalData.player_hand[int(input)]
 			player_field.append([selected_card_no])
 			player_field_vis.append(false)
-			GlobalData.player_game_data['field_mod'].append({"power": {}, "bp": {}})
+			GlobalData.player_game_data['field_mod'].append({"power": {}, "bp_mod": {}})
 			GlobalData.player_hand.pop_at(input)
-			print(player_field, opp_field)
 			emit_signal("hand_changed", "player", GlobalData.player_hand)
 			emit_signal("field_changed", "player", player_field, player_field_vis, player_field_mod)
 			action_buttons_hide()
@@ -282,7 +283,7 @@ func set_character_phase(input, caller):
 			var selected_card_no = GlobalData.opp_hand[int(input)]
 			opp_field.append([selected_card_no])
 			opp_field_vis.append(false)
-			GlobalData.opp_game_data['field_mod'].append({"power": {}, "bp": {}})
+			GlobalData.opp_game_data['field_mod'].append({"power": {}, "bp_mod": {}})
 			GlobalData.opp_hand.pop_at(input)
 			emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
 			emit_signal("field_changed", "opponent", opp_field, opp_field_vis, opp_field_mod)
@@ -377,9 +378,8 @@ func open_phase():
 	# TODO update everything with game_data instead of a list of the elements
 	for game_data in [player_game_data, opp_game_data]:
 	# [[player_field_vis, player_action_queue], [opp_field_vis, opp_action_queue]]:
-		print(game_data)
 		for i in range(0,player_field_vis.size()):
-			print(GlobalData.cards[game_data['field'][i][0]].abilities)
+			#print(GlobalData.cards[game_data['field'][i][0]].abilities)
 			# If card is being turned face up add its first ability is trigger = 'ENTER_PLAY' and stack_condition is met
 			if (game_data["field_vis"][i] == false and GlobalData.cards[game_data['field'][i][0]]['abilities'].size() > 0):
 				if (GlobalData.cards[game_data['field'][i][0]]['abilities'][0]["trigger"] == 'ENTER_PLAY'
@@ -611,17 +611,22 @@ func _hand_changed_emitted(player, hand):
 func _field_changed_emitted(player, field, field_vis, field_mod):
 	'''Process RPC for field updates'''
 	# Process CONT effects before sending out updates
-
+	$ActionControl.update_cont_effects()
+	print("Global Player Data", GlobalData.player_game_data)
+	print("Global Opp Data", GlobalData.opp_game_data)
 	
-	if player == "player":
-		#Process cont effect everytime field is updated
-		update_field(player, field, field_vis, player_field_mod)
-		rpc("update_field", "opponent", field, field_vis, player_field_mod)
-	if player == "opponent":
-		#Process cont effect everytime field is updated
-
-		update_field(player, field, field_vis, opp_field_mod)
-		rpc("update_field", "player", field, field_vis, opp_field_mod)
+	#Always update All Fields
+	update_field('player', player_field, player_field_vis, GlobalData.player_game_data['field_mod'])
+	rpc("update_field", "opponent", player_field, player_field_vis, GlobalData.player_game_data['field_mod'])
+	update_field('opponent', opp_field, opp_field_vis, GlobalData.opp_game_data['field_mod'])
+	rpc("update_field", "player", opp_field, opp_field_vis, GlobalData.opp_game_data['field_mod'])
+	
+	#if player == "player":
+		#update_field(player, field, field_vis, GlobalData.player_game_data['field_mod'])
+		#rpc("update_field", "opponent", field, field_vis, GlobalData.player_game_data['field_mod'])
+	#if player == "opponent":
+		#update_field(player, field, field_vis, GlobalData.opp_game_data['field_mod'])
+		#rpc("update_field", "player", field, field_vis, GlobalData.opp_game_data['field_mod'])
 
 @rpc("any_peer", "reliable")
 func update_hand(player, hand):
@@ -645,6 +650,10 @@ func update_hand(player, hand):
 
 @rpc("any_peer", "reliable")
 func update_field(player, field, field_vis, field_mod):
+	if field.size() < 1:
+		
+		return
+	print(field, field_vis, field_mod)
 	if player == "player":
 		$PlayerField.visualize(field, field_vis, field_mod)
 		for ind in range(0, field_vis.size()):
@@ -897,8 +906,8 @@ func configure_local_test():
 	var IP_ADDRESS = "127.0.0.1"
 	var PORT = 54321
 	if is_server:
-		GlobalData.player_deck.deckdict = {"SD01-001":4,"SD01-004":4,"SD01-007":4,"SD01-008":3,"SD01-009":4}
-		GlobalData.opp_deck.deckdict = {"SD01-001":4,"SD01-004":4,"SD01-007":4,"SD01-008":3,"SD01-009":4}
+		GlobalData.player_deck.deckdict = {"SD01-005":4,"SD01-008":4,"SD01-011":4,"SD02-002":4,"SD02-012":4}
+		GlobalData.opp_deck.deckdict = {"SD01-005":4,"SD01-008":4,"SD01-011":4,"SD02-002":4,"SD02-012":4}
 		GlobalData.player_id = "Server"
 		GlobalData.opp_id = "Client"
 		var peer = ENetMultiplayerPeer.new()
@@ -964,10 +973,8 @@ func send_opp_deck(deckdict):
 
 @rpc("any_peer", 'reliable')
 func request_rematch(player_id):
-	print(rematch_requests)
 	if player_id not in rematch_requests:
 		rematch_requests.append(player_id)
-	print(rematch_requests)
 
 	if rematch_requests.size() >= 2:
 		rpc("start_rematch")
@@ -1030,10 +1037,8 @@ func highlight_clicked_rpc(caller, selected_ind, selected_card, clicked_index, c
 	'''Does level up logic based on the caller'''
 	if caller == 'server':
 		#Get the selected index from playerfield to update player_field list
-		print("Level up Clicked", player_field)
 		player_field[clicked_index] = [selected_card] + player_field[clicked_index]
 		player_field_vis[clicked_index] = false
-		print("Level up Clicked2", player_field)
 		#Remove Card from hand
 		GlobalData.player_hand.pop_at(selected_ind)
 		
@@ -1043,10 +1048,8 @@ func highlight_clicked_rpc(caller, selected_ind, selected_card, clicked_index, c
 		
 	elif caller == 'client':
 		#Get the selected index from playerfield to update player_field list
-		print("Level up Clicked", opp_field)
 		opp_field[clicked_index] = [selected_card] + opp_field[clicked_index]
 		opp_field_vis[clicked_index] = false
-		print("Level up Clicked2", opp_field)
 		#Remove Card from hand
 		GlobalData.opp_hand.pop_at(selected_ind)
 		
