@@ -115,10 +115,12 @@
 			{
 				"trigger": "CONTINUOUS",
 				"stack_condition": ["SINGLE", "DOUBLE"],
-				"extra_condition": ["opponent_type_power"],
-				"target": "SELF",
 				"effect": [{
-					"BP_GRADE_UP": 1
+					"effect_name": "SELF_BP_CHANGE_OPP_TYPE",
+					"input": {
+						"bp_mod": 1,
+						"type": ["POWER"]
+					}
 				}]
 			}
 		],
@@ -172,10 +174,12 @@
 			{
 				"trigger": "CONTINUOUS",
 				"stack_condition": ["SINGLE", "DOUBLE"],
-				"extra_condition": ["opponent_type_armed"],
-				"target": "SELF",
 				"effect": [{
-					"BP_GRADE_UP": 1
+					"effect_name": "SELF_BP_CHANGE_OPP_TYPE",
+					"input": {
+						"bp_mod": 1,
+						"type": ["ARMED"]
+					}
 				}]
 			}
 		],
@@ -229,10 +233,12 @@
 			{
 				"trigger": "CONTINUOUS",
 				"stack_condition": ["SINGLE", "DOUBLE"],
-				"extra_condition": ["opponent_type_speed"],
-				"target": "SELF",
 				"effect": [{
-					"BP_GRADE_UP": 1
+					"effect_name": "SELF_BP_CHANGE_OPP_TYPE",
+					"input": {
+						"bp_mod": 1,
+						"type": ["SPEED"]
+					}
 				}]
 			}
 		],
@@ -248,17 +254,19 @@
 		"bp": {
 			"SINGLE": 10000,
 			"DOUBLE": 16000,
-			"extra": 8000
+			"EXTRA": 8000
 		},
 		"ability_text": "[SINGLE][DOUBLE] While this character's battle opponent has TYPE <BASIC>, this character's BP becomes EXTRA.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
 				"stack_condition": ["SINGLE", "DOUBLE"],
-				"extra_condition": ["opponent_type_basic"],
-				"target": "SELF",
 				"effect": [{
-					"BP_GRADE_EXTRA": 0
+					"effect_name": "SELF_BP_CHANGE_OPP_TYPE",
+					"input": {
+						"bp_mod": 1,
+						"type": ["EXTRA"]
+					}
 				}]
 			}
 		],
@@ -310,5 +318,5 @@
 			}
 		],
 		"image_path": "res://images/cards/SD01/SD01-014.webp"
-	},
+	}
 ]

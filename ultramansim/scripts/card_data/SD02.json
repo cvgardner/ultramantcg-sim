@@ -113,12 +113,15 @@
 			{
 				"trigger": "CONTINUOUS",
 				"stack_condition": ["SINGLE", "DOUBLE"],
-                "extra_condition": ["opponent_type_armed"],
-				"target": "SELF",
 				"effect": [{
-					"BP_GRADE_UP": 1
-			}]
+					"effect_name": "SELF_BP_CHANGE_OPP_TYPE",
+					"input": {
+						"bp_mod": 1,
+						"type": ["ARMED"]
+					}
+				}]
 			}
+			
 		],
 		"image_path": "res://images/cards/SD02/SD02-005.webp"
 	},
@@ -170,11 +173,13 @@
 			{
 				"trigger": "CONTINUOUS",
 				"stack_condition": ["SINGLE", "DOUBLE"],
-				"extra_condition": ["opponent_type_armed"],
-                "target": "SELF",
 				"effect": [{
-					"BP_GRADE_UP": 1
-			}]
+					"effect_name": "SELF_BP_CHANGE_OPP_TYPE",
+					"input": {
+						"bp_mod": 1,
+						"type": ["ARMED"]
+					}
+				}]
 			}
 		],
 		"image_path": "res://images/cards/SD02/SD02-008.webp"
@@ -227,11 +232,13 @@
 			{
 				"trigger": "CONTINUOUS",
 				"stack_condition": ["SINGLE", "DOUBLE"],
-				"extra_condition": ["opponent_type_armed"],
-                "target": "SELF",
 				"effect": [{
-					"BP_GRADE_UP": 1
-			}]
+					"effect_name": "SELF_BP_CHANGE_OPP_TYPE",
+					"input": {
+						"bp_mod": 1,
+						"type": ["ARMED"]
+					}
+				}]
 			}
 		],
 		"image_path": "res://images/cards/SD02/SD02-011.webp"
@@ -246,18 +253,20 @@
 		"bp": {
 			"SINGLE": 10000,
 			"DOUBLE": 16000,
-			"extra": 8000
+			"EXTRA": 8000
 		},
 		"ability_text": "[SINGLE][DOUBLE] While this character's battle opponent has TYPE <BASIC>, this character's BP grade becomes EXTRA.",
 		"abilities": [
 			{
 				"trigger": "CONTINUOUS",
 				"stack_condition": ["SINGLE", "DOUBLE"],
-				"extra_condition": ["opponent_type_basic"],
-                "target": "SELF",
 				"effect": [{
-					"BP_GRADE_EXTRA": 0
-			}]
+					"effect_name": "SELF_BP_CHANGE_OPP_TYPE",
+					"input": {
+						"bp_mod": "EXTRA",
+						"type": ["BASIC"]
+					}
+				}]
 			}
 		],
 		"image_path": "res://images/cards/SD02/SD02-012.webp"

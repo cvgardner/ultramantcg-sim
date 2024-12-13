@@ -149,7 +149,10 @@ func bp_change(mod):
 				bp_int = 2
 			"TRIPLE":
 				bp_int = 3
-		var new_bp = stack_map[int(bp_int+mod)]
+		var new_bp = self.curr_stack
+		for i in range(int(bp_int+mod), -1, -1):
+			if stack_map.get(i):
+				stack_map[int(bp_int+mod)]
 		print(new_bp)
 		self.curr_power = self.bp[new_bp]
 		self._update_power_text(self.curr_power)

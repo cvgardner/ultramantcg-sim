@@ -413,6 +413,16 @@ func open_phase_rpc():
 @rpc('any_peer', 'reliable')
 func open_phase_action_ui(input, action_queue):
 	"handles UI for open phase ability activation and closure"
+	# Handle no action queue + init
+	if input == 'init' and action_queue.size() == 0:
+		if multiplayer.is_server():
+			open_phase_action_ui('finished', [])
+			open_phase_action_end('server')
+		else:
+			open_phase_action_ui("finished", [])
+			rpc("open_phase_action_end", "client")
+		return
+	
 	if input == 'init':
 		if multiplayer.is_server() == false:
 			current_phase = Phase.OPEN
@@ -449,8 +459,8 @@ func effect_activation_phase():
 	player_action_queue = []
 	opp_action_queue = []
 	# Put all field cards into action_queue that have trigger: ACTIVATE
-	player_action_queue = player_field.map(func(n): return n[0])
-	opp_action_queue = opp_field.map(func(n): return n[0])
+	player_game_data['action_queue'] = [] #player_field.map(func(n): return n[0])
+	opp_game_data['action_queue'] = [] #opp_field.map(func(n): return n[0])
 	
 	# TODO Add Scene to ActionQueue
 	
@@ -464,6 +474,16 @@ func effect_activation_phase():
 @rpc('any_peer', 'reliable')
 func effect_activation_phase_ui(input, action_queue):
 	"handles UI for open phase ability activation and closure"
+	# Handle no action queue + init
+	if input == 'init' and action_queue.size() == 0:
+		if multiplayer.is_server():
+			effect_activation_phase_ui('finished', [])
+			effect_activation_phase_end('server')
+		else:
+			effect_activation_phase_ui("finished", [])
+			rpc("effect_activation_phase_end", "client")
+		return
+	
 	if input == 'init':
 		if multiplayer.is_server() == false:
 			current_phase = Phase.EFFECT_ACTIVATION
