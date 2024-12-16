@@ -214,7 +214,8 @@ func set_scene_phase(input, owner):
 		GlobalData.player_hand.pop_at(input)
 		GlobalData.player_hand = GlobalData.player_hand + GlobalData.player_deck.draw_card(1)
 		emit_signal("hand_changed", "player", GlobalData.player_hand)
-		player_game_data['scene_owner'] = true
+		player_game_data['scene_owner'] = selected_card_no
+		opp_game_data['scene_owner'] = ''
 		if GlobalData.cards[selected_card_no].abilities.size() > 0:
 			if GlobalData.cards[selected_card_no].abilities[0]['trigger'] == 'ENTER_PLAY':
 				$ActionControl.process_scene_enters_effects(selected_card_no) 	#Process Scene Enters Ability
@@ -226,7 +227,8 @@ func set_scene_phase(input, owner):
 		set_scene_ui(selected_card_no)
 		rpc("set_scene_ui", selected_card_no)
 		GlobalData.opp_hand.pop_at(input)
-		opp_game_data['scene_owner'] = true
+		opp_game_data['scene_owner'] = selected_card_no
+		player_game_data['scene_owner'] = ''
 		GlobalData.opp_hand = GlobalData.opp_hand + GlobalData.opp_deck.draw_card(1)
 		emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
 		if GlobalData.cards[selected_card_no].abilities.size() > 0:
@@ -370,7 +372,32 @@ func level_phase_highlight(selected):
 			if card.level == selected_card.level - 1 && card.character == selected_card.character and can_level[i]:
 				card.show_highlight()
 		
+# --- Effect Activation UI Stuff --- #
+
+@rpc("any_peer", "reliable")
+func activate_effect(caller):
+	'''This function sends the index of the selected card from ActionQueue to activate
+	inputs: caller - determines server/client who is submitting the effect
+	connected to $ActionControl.ActionQueue.ActionActivateButton pressed
+	'''
+	# TODO - Connect to signal
+	if len($ActionControl/ActionQueue.get_selected_items()) > 0:
+		$ActionControl.activate_effect($ActionControl/ActionQueue.get_selected_items()[0], caller)
+	pass
 	
+func effect_activated():
+	''' Unsure if I need this function but it might help with handling inputs'''
+	pass
+	
+func effect_finished():
+	''' Processes UI updates after an effect as finished resolving
+	connected to signal $ActionConrol.effect_finished'''
+	# TODO - Connect to Signal
+	# TODO - Update Hand
+	# TODO - Update Field
+	# TODO - Update ActionControls
+	
+
 @rpc("any_peer", "reliable")
 func open_phase():
 	player_action_queue = []
@@ -459,17 +486,17 @@ func effect_activation_phase():
 	player_action_queue = []
 	opp_action_queue = []
 	# Put all field cards into action_queue that have trigger: ACTIVATE
-	player_game_data['action_queue'] = [] #player_field.map(func(n): return n[0])
-	opp_game_data['action_queue'] = [] #opp_field.map(func(n): return n[0])
+	GlobalData.player_game_data['action_queue'] = [] #player_field.map(func(n): return n[0])
+	GlobalData.opp_game_data['action_queue'] = [] #opp_field.map(func(n): return n[0])
 	
 	# TODO Add Scene to ActionQueue
 	
 	
 	
 	if is_lead:
-		effect_activation_phase_ui('init', player_game_data['action_queue'])
+		effect_activation_phase_ui('init', GlobalData.player_game_data['action_queue'])
 	else:
-		rpc("effect_activation_phase_ui", 'init', opp_game_data['action_queue'])
+		rpc("effect_activation_phase_ui", 'init', GlobalData.opp_game_data['action_queue'])
 		
 @rpc('any_peer', 'reliable')
 func effect_activation_phase_ui(input, action_queue):

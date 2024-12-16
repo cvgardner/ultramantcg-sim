@@ -17,7 +17,7 @@ var player_game_data = {
 	"effect_queue": [], # List of card_no to help process effects
 	"hand": [], # Array of card_no representing hand of cards
 	"deck": Deck.new(), # Deck object
-	"scene_owner": false # Boolean representing if this player controls the scene
+	"scene_owner": '' # str equal to '' if player doesn't own scene otherwise card_no
 }
 
 var opp_game_data = {
@@ -27,7 +27,7 @@ var opp_game_data = {
 	"action_queue": [],
 	"hand": [],
 	"deck": Deck.new(),
-	"scene_owner": false
+	"scene_owner": ''
 }
 
 var stack_map = {
