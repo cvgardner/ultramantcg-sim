@@ -94,7 +94,7 @@
 			"SINGLE": 5000
 		},
 		"ability_text": "",
-		"abilities": [
+		"abilities": [{}
 		],
 		"image_path": "res://images/cards/SD01/SD01-004.webp"
 	},

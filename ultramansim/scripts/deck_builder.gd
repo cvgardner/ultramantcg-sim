@@ -96,7 +96,7 @@ func update_deck_list_ui():
 	deck_list.clear()
 	var index = 0
 	for card_no in player_deck.deckdict.keys():
-		deck_list.add_item(str(player_deck.deckdict[card_no]), available_cards[card_no].image)
+		deck_list.add_item(str(player_deck.deckdict[card_no]), all_cards_list[card_no].image)
 		#deck_list.add_item(str(player_deck.deckdict[card_no]) + "x " + card_no)
 		deck_list.set_item_metadata(index, card_no)
 		index += 1
@@ -194,7 +194,10 @@ func reset_filters():
 	'''Resets the filters and available cards'''
 	for filter in [feature_filter, level_filter, character_filter, type_filter]:
 		filter.select(0)
+	print(feature_filter.text, level_filter.text, character_filter.text, type_filter.text)
+	print(available_cards)
 	apply_filters("DUMMY")
+	print(available_cards)
 
 func _add_card_to_deck(index):
 	'''Adds the specified card to the players deck if the deck isnt't already 
@@ -217,7 +220,7 @@ func _remove_card_from_deck(index):
 func _preview_card(item):
 	if item != 'none':
 		card_preview.set_visible(true)
-		card_preview.set_texture(available_cards[item].image)
+		card_preview.set_texture(all_cards_list[item].image)
 	#elif item == 'none':
 		#card_preview.set_visible(false)
 

@@ -34,7 +34,7 @@ var player_game_data = {
 	"action_queue": player_action_queue,
 	"hand": GlobalData.player_hand,
 	"deck": GlobalData.player_deck.deck,
-	"scene_owner": false
+	"scene_owner": ''
 }
 
 
@@ -45,7 +45,7 @@ var opp_game_data = {
 	"action_queue": opp_action_queue,
 	"hand": GlobalData.opp_hand,
 	"deck": GlobalData.opp_deck.deck,
-	"scene_owner": false
+	"scene_owner": ''
 }
 
 var stack_map = {
@@ -97,6 +97,8 @@ func _ready() -> void:
 	$GameEndNode/MainMenuButton2.pressed.connect(_on_BackButton_pressed)
 	$GameEndNode/RematchButton.pressed.connect(_on_rematch_button_pressed)
 	$PlayerField.item_clicked.connect(highlight_clicked)
+	$ActionControl/ActionQueue/ActionActivateButton.pressed.connect(activate_effect)
+	$ActionControl.effect_finished.connect(effect_finished)
 
 	
 	#Hide some UI components
@@ -374,16 +376,22 @@ func level_phase_highlight(selected):
 		
 # --- Effect Activation UI Stuff --- #
 
-@rpc("any_peer", "reliable")
-func activate_effect(caller):
+
+func activate_effect():
 	'''This function sends the index of the selected card from ActionQueue to activate
 	inputs: caller - determines server/client who is submitting the effect
 	connected to $ActionControl.ActionQueue.ActionActivateButton pressed
 	'''
-	# TODO - Connect to signal
+	if multiplayer.is_server():
+		activate_effect_rpc('server')
+	else:
+		rpc("activate_effect_rpc", "client")
+
+	
+@rpc("any_peer", "reliable")
+func activate_effect_rpc(caller):
 	if len($ActionControl/ActionQueue.get_selected_items()) > 0:
 		$ActionControl.activate_effect($ActionControl/ActionQueue.get_selected_items()[0], caller)
-	pass
 	
 func effect_activated():
 	''' Unsure if I need this function but it might help with handling inputs'''
@@ -392,11 +400,17 @@ func effect_activated():
 func effect_finished():
 	''' Processes UI updates after an effect as finished resolving
 	connected to signal $ActionConrol.effect_finished'''
-	# TODO - Connect to Signal
-	# TODO - Update Hand
-	# TODO - Update Field
-	# TODO - Update ActionControls
 	
+	# Update Hand
+	emit_signal("hand_changed", "player", GlobalData.player_hand)
+	emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
+	# Update Field
+	update_field('player', player_field, player_field_vis, GlobalData.player_game_data['field_mod'])
+	rpc("update_field", "opponent", player_field, player_field_vis, GlobalData.player_game_data['field_mod'])
+	update_field('opponent', opp_field, opp_field_vis, GlobalData.opp_game_data['field_mod'])
+	rpc("update_field", "player", opp_field, opp_field_vis, GlobalData.opp_game_data['field_mod'])
+	# Update ActionControls
+	action_queue_refresh()
 
 @rpc("any_peer", "reliable")
 func open_phase():
@@ -409,7 +423,7 @@ func open_phase():
 			#print(GlobalData.cards[game_data['field'][i][0]].abilities)
 			# If card is being turned face up add its first ability is trigger = 'ENTER_PLAY' and stack_condition is met
 			if (game_data["field_vis"][i] == false and GlobalData.cards[game_data['field'][i][0]]['abilities'].size() > 0):
-				if (GlobalData.cards[game_data['field'][i][0]]['abilities'][0]["trigger"] == 'ENTER_PLAY'
+				if (GlobalData.cards[game_data['field'][i][0]]['abilities'][0].get("trigger") == 'ENTER_PLAY'
 					and stack_map[game_data['field'][i].size()] in GlobalData.cards[game_data['field'][i][0]]['abilities'][0]["stack_condition"]
 				): # TODO update with multi abilities when they are released
 					game_data['action_queue'].append(game_data['field'][i][0]) 
@@ -483,20 +497,40 @@ func open_phase_action_end(input):
 func effect_activation_phase():
 	# TODO: Handle Activate Effects
 	# Clear Action Queues
-	player_action_queue = []
-	opp_action_queue = []
+	GlobalData.player_game_data['action_queue'] = []
+	GlobalData.opp_game_data['action_queue'] = []
+	
 	# Put all field cards into action_queue that have trigger: ACTIVATE
-	GlobalData.player_game_data['action_queue'] = [] #player_field.map(func(n): return n[0])
-	GlobalData.opp_game_data['action_queue'] = [] #opp_field.map(func(n): return n[0])
-	
-	# TODO Add Scene to ActionQueue
-	
+	$ActionControl.get_activate_effects()
+	print("Player Action Queue: ", GlobalData.player_game_data['action_queue'])
+	print("Opp Action Queue: ", GlobalData.opp_game_data['action_queue'])
 	
 	
 	if is_lead:
 		effect_activation_phase_ui('init', GlobalData.player_game_data['action_queue'])
 	else:
 		rpc("effect_activation_phase_ui", 'init', GlobalData.opp_game_data['action_queue'])
+
+func action_queue_refresh():
+	''' Refresh both players action queue. This is fine because the non-active player's ui is hidden'''
+	print("Player Action Queue: ", GlobalData.player_game_data['action_queue'])
+	print("Opp Action Queue: ", GlobalData.opp_game_data['action_queue'])
+	# Don't need to determine player to refresh action queue because the non-active player is hidden
+	if multiplayer.is_server():
+		action_queue_refresh_rpc(GlobalData.player_game_data['action_queue'])
+	else:
+		rpc("action_queue_refresh_rpc", GlobalData.opp_game_data['action_queue'])
+	
+	
+@rpc("any_peer", "reliable")
+func action_queue_refresh_rpc(action_queue):
+	$ActionQueue/ActionList.clear()
+	var index = 0
+	for card in action_queue:
+		$ActionQueue/ActionList.add_item("", GlobalData.cards[card].image)
+		$ActionQueue/ActionList.set_item_metadata(index, card)
+		index += 1
+	$ActionQueue/ActionList.queue_redraw()
 		
 @rpc('any_peer', 'reliable')
 func effect_activation_phase_ui(input, action_queue):
@@ -953,8 +987,8 @@ func configure_local_test():
 	var IP_ADDRESS = "127.0.0.1"
 	var PORT = 54321
 	if is_server:
-		GlobalData.player_deck.deckdict = {"SD01-005":4,"SD01-008":4,"SD01-011":4,"SD02-002":4,"SD02-012":4}
-		GlobalData.opp_deck.deckdict = {"SD01-005":4,"SD01-008":4,"SD01-011":4,"SD02-002":4,"SD02-012":4}
+		GlobalData.player_deck.deckdict = {"SD01-002":4,"SD01-004":4,"SD01-005":4,"SD01-014":4,"SD02-014":4}
+		GlobalData.opp_deck.deckdict = {"SD01-002":4,"SD01-004":4,"SD01-005":4,"SD01-014":4,"SD02-014":4}
 		GlobalData.player_id = "Server"
 		GlobalData.opp_id = "Client"
 		var peer = ENetMultiplayerPeer.new()

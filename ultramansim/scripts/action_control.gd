@@ -25,17 +25,17 @@ func get_activate_effects():
 		#Check for player Activate
 		var player_card = GlobalData.cards[GlobalData.player_game_data['field'][i][0]]
 		print("Player Trigger: ",  player_card.abilities[0].get('trigger'))
-		print("Player Stack, Condition: ", GlobalData.player_game_data['field'][i].size(), ' ', player_card.abilities[0]['stack_condition'])
+		print("Player Stack, Condition: ", GlobalData.player_game_data['field'][i].size(), ' ', player_card.abilities[0].get('stack_condition'))
 		if (player_card.abilities[0].get('trigger') == 'ACTIVATE' 
-		and GlobalData.stack_map[GlobalData.player_game_data['field'][i].size()] in player_card.abilities[0]['stack_condition']):
+		and GlobalData.stack_map[GlobalData.player_game_data['field'][i].size()] in player_card.abilities[0].get('stack_condition')):
 			GlobalData.player_game_data['action_queue'].append({"card": player_card, "index": i})
 		#Check for Opp cont
 		var opp_card = GlobalData.cards[GlobalData.opp_game_data['field'][i][0]]
 		print("Opp Trigger: ",  opp_card.abilities[0].get('trigger'))
-		print("Opp Stack, Condition: ", GlobalData.opp_game_data['field'][i].size(), ' ', opp_card.abilities[0]['stack_condition'])
+		print("Opp Stack, Condition: ", GlobalData.opp_game_data['field'][i].size(), ' ', opp_card.abilities[0].get('stack_condition'))
 
 		if (opp_card.abilities[0].get('trigger') == 'ACTIVATE' 
-		and GlobalData.stack_map[GlobalData.opp_game_data['field'][i].size()] in opp_card.abilities[0]['stack_condition']):
+		and GlobalData.stack_map[GlobalData.opp_game_data['field'][i].size()] in opp_card.abilities[0].get('stack_condition')):
 			GlobalData.opp_game_data['action_queue'].append({"card": opp_card, "index": i})
 
 	# Get Activate Effects for Scene
@@ -78,17 +78,17 @@ func update_cont_effects():
 		#Check for player cont
 		var player_card = GlobalData.cards[GlobalData.player_game_data['field'][i][0]]
 		print("Player Trigger: ",  player_card.abilities[0].get('trigger'))
-		print("Player Stack, Condition: ", GlobalData.player_game_data['field'][i].size(), ' ', player_card.abilities[0]['stack_condition'])
+		print("Player Stack, Condition: ", GlobalData.player_game_data['field'][i].size(), ' ', player_card.abilities[0].get('stack_condition'))
 		if (player_card.abilities[0].get('trigger') == 'CONTINUOUS' 
-		and GlobalData.stack_map[GlobalData.player_game_data['field'][i].size()] in player_card.abilities[0]['stack_condition']):
+		and GlobalData.stack_map[GlobalData.player_game_data['field'][i].size()] in player_card.abilities[0].get('stack_condition')):
 			parse_cont_effect(player_card, {"index":i, "caller": "player"})
 		#Check for Opp cont
 		var opp_card = GlobalData.cards[GlobalData.opp_game_data['field'][i][0]]
 		print("Opp Trigger: ",  opp_card.abilities[0].get('trigger'))
-		print("Opp Stack, Condition: ", GlobalData.opp_game_data['field'][i].size(), ' ', opp_card.abilities[0]['stack_condition'])
+		print("Opp Stack, Condition: ", GlobalData.opp_game_data['field'][i].size(), ' ', opp_card.abilities[0].get('stack_condition'))
 
 		if (opp_card.abilities[0].get('trigger') == 'CONTINUOUS' 
-		and GlobalData.stack_map[GlobalData.opp_game_data['field'][i].size()] in opp_card.abilities[0]['stack_condition']):
+		and GlobalData.stack_map[GlobalData.opp_game_data['field'][i].size()] in opp_card.abilities[0].get('stack_condition')):
 			parse_cont_effect(opp_card, {"index":i, "caller": "opponent"})
 			
 func parse_cont_effect(card, extra_input):
