@@ -6,6 +6,7 @@ var is_lead : bool # Boolean signifying if the server is lead or not
 @onready var battle_log = $BattleLog
 @onready var card_preview = $CardPreview
 @onready var load_deck_options = $GameEndNode/LoadDeckOptions
+@onready var action_list = $ActionControl/ActionQueue/ActionList
 var battle_log_text = "" # String battle log text
 enum Phase { SETUP, START, DRAW, LEAD_SCENE_SET, SET_CHARACTER, LEVEL_UP, OPEN, EFFECT_ACTIVATION, JUDGEMENT, END}
 var current_phase 
@@ -218,11 +219,7 @@ func set_scene_phase(input, owner):
 		emit_signal("hand_changed", "player", GlobalData.player_hand)
 		player_game_data['scene_owner'] = selected_card_no
 		opp_game_data['scene_owner'] = ''
-		if GlobalData.cards[selected_card_no].abilities.size() > 0:
-			if GlobalData.cards[selected_card_no].abilities[0]['trigger'] == 'ENTER_PLAY':
-				$ActionControl.process_scene_enters_effects(selected_card_no) 	#Process Scene Enters Ability
-		else:
-			set_scene_phase_end()
+		set_scene_phase_end()
 
 	elif not is_lead:
 		var selected_card_no = GlobalData.opp_hand[int(input)]
@@ -233,18 +230,15 @@ func set_scene_phase(input, owner):
 		player_game_data['scene_owner'] = ''
 		GlobalData.opp_hand = GlobalData.opp_hand + GlobalData.opp_deck.draw_card(1)
 		emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
-		if GlobalData.cards[selected_card_no].abilities.size() > 0:
-			if GlobalData.cards[selected_card_no].abiliaties[0]['trigger'] == 'ENTER_PLAY':
-				$ActionControl.process_scene_enters_effects(selected_card_no) 	#Process Scene Enters Ability
-		else:
-			set_scene_phase_end()
+		set_scene_phase_end()
+	
 
 func set_scene_phase_end():
 	action_buttons_hide()
-	if is_lead:
-		set_phase(Phase.SET_CHARACTER)
-	else:
-		rpc("set_phase", Phase.SET_CHARACTER)
+	#if is_lead:
+	set_phase(Phase.SET_CHARACTER)
+	#else:
+		#rpc("set_phase", Phase.SET_CHARACTER)
 		
 @rpc("any_peer", "reliable")
 func set_scene_ui(selected_card_no):
@@ -390,8 +384,8 @@ func activate_effect():
 	
 @rpc("any_peer", "reliable")
 func activate_effect_rpc(caller):
-	if len($ActionControl/ActionQueue.get_selected_items()) > 0:
-		$ActionControl.activate_effect($ActionControl/ActionQueue.get_selected_items()[0], caller)
+	if len($ActionControl/ActionQueue/ActionList.get_selected_items()) > 0:
+		$ActionControl.activate_effect($ActionControl/ActionQueue/ActionList.get_selected_items()[0], caller)
 	
 func effect_activated():
 	''' Unsure if I need this function but it might help with handling inputs'''
@@ -414,10 +408,10 @@ func effect_finished():
 
 @rpc("any_peer", "reliable")
 func open_phase():
-	player_action_queue = []
-	opp_action_queue = []
+	GlobalData.player_game_data['action_queue'] = []
+	GlobalData.opp_game_data['action_queue'] = []
 	# TODO update everything with game_data instead of a list of the elements
-	for game_data in [player_game_data, opp_game_data]:
+	for game_data in [GlobalData.player_game_data, GlobalData.opp_game_data]:
 	# [[player_field_vis, player_action_queue], [opp_field_vis, opp_action_queue]]:
 		for i in range(0,player_field_vis.size()):
 			#print(GlobalData.cards[game_data['field'][i][0]].abilities)
@@ -516,21 +510,21 @@ func action_queue_refresh():
 	print("Player Action Queue: ", GlobalData.player_game_data['action_queue'])
 	print("Opp Action Queue: ", GlobalData.opp_game_data['action_queue'])
 	# Don't need to determine player to refresh action queue because the non-active player is hidden
-	if multiplayer.is_server():
-		action_queue_refresh_rpc(GlobalData.player_game_data['action_queue'])
-	else:
-		rpc("action_queue_refresh_rpc", GlobalData.opp_game_data['action_queue'])
+	action_queue_refresh_rpc(GlobalData.player_game_data['action_queue'])
+	rpc("action_queue_refresh_rpc", GlobalData.opp_game_data['action_queue'])
 	
 	
 @rpc("any_peer", "reliable")
 func action_queue_refresh_rpc(action_queue):
-	$ActionQueue/ActionList.clear()
+	action_list.clear()
 	var index = 0
-	for card in action_queue:
-		$ActionQueue/ActionList.add_item("", GlobalData.cards[card].image)
-		$ActionQueue/ActionList.set_item_metadata(index, card)
+	for action in action_queue:
+		var card_no = action.get('card').card_no
+		print("Action List: ", card_no)
+		action_list.add_item("", GlobalData.cards[card_no].image)
+		action_list.set_item_metadata(index, card_no)
 		index += 1
-	$ActionQueue/ActionList.queue_redraw()
+	action_list.queue_redraw()
 		
 @rpc('any_peer', 'reliable')
 func effect_activation_phase_ui(input, action_queue):
@@ -554,6 +548,7 @@ func effect_activation_phase_ui(input, action_queue):
 		
 		# TODO pass action_queue to the $ActionControl
 		print(action_queue)
+		action_queue_refresh_rpc(action_queue)
 		$ActionControl/ActionQueue.show()
 		
 	elif input == 'finished':
@@ -616,9 +611,14 @@ func judgement_phase():
 func end_phase():
 	# TODO: End of Turn Effects
 	# TODO: Reset Card power
-	current_round += 1
+	increase_round()
+	rpc("increase_round")
 	set_phase(Phase.START)
 	pass
+
+@rpc("any_peer", 'reliable')
+func increase_round():
+	current_round += 1
 	
 @rpc("any_peer", "reliable")
 func game_end(is_winner):
@@ -831,7 +831,7 @@ func _action_button_pressed():
 	
 	elif action_button.text == "Set Scene":
 		if len($PlayerHand.get_selected_items()) > 0:
-
+			print("Current Round: ", current_round)
 			var selected_item_index = $PlayerHand.get_selected_items()[0]
 			var selected_card = GlobalData.cards[$PlayerHand.get_item_metadata(selected_item_index)]
 			if multiplayer.is_server() and selected_card.feature == "Scene" and selected_card.level <= current_round:
@@ -963,6 +963,13 @@ func configure_hand_ui():
 	$OppHand.set_allow_reselect(true)
 	$OppHand.set_allow_rmb_select(true)
 	$OppHand.set_icon_mode(0)
+	
+	action_list.auto_height = true
+	action_list.set_max_columns(0)
+	action_list.fixed_icon_size = Vector2(50, 75)
+	action_list.set_allow_reselect(true)
+	action_list.set_allow_rmb_select(true)
+	action_list.set_icon_mode(0)
 	#$OppHand.hovered_item.connect(_preview_card)
 
 func _clear_hbox_container(hbox):
