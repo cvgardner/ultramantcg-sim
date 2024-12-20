@@ -410,17 +410,22 @@ func effect_finished():
 func open_phase():
 	GlobalData.player_game_data['action_queue'] = []
 	GlobalData.opp_game_data['action_queue'] = []
+	$ActionControl.get_enters_play_effects()
+	print("Player Action Queue: ", GlobalData.player_game_data['action_queue'])
+	print("Opp Action Queue: ", GlobalData.opp_game_data['action_queue'])
+	
 	# TODO update everything with game_data instead of a list of the elements
 	for game_data in [GlobalData.player_game_data, GlobalData.opp_game_data]:
 	# [[player_field_vis, player_action_queue], [opp_field_vis, opp_action_queue]]:
 		for i in range(0,player_field_vis.size()):
 			#print(GlobalData.cards[game_data['field'][i][0]].abilities)
 			# If card is being turned face up add its first ability is trigger = 'ENTER_PLAY' and stack_condition is met
-			if (game_data["field_vis"][i] == false and GlobalData.cards[game_data['field'][i][0]]['abilities'].size() > 0):
-				if (GlobalData.cards[game_data['field'][i][0]]['abilities'][0].get("trigger") == 'ENTER_PLAY'
-					and stack_map[game_data['field'][i].size()] in GlobalData.cards[game_data['field'][i][0]]['abilities'][0]["stack_condition"]
-				): # TODO update with multi abilities when they are released
-					game_data['action_queue'].append(game_data['field'][i][0]) 
+			
+			#if (game_data["field_vis"][i] == false and GlobalData.cards[game_data['field'][i][0]]['abilities'].size() > 0):
+				#if (GlobalData.cards[game_data['field'][i][0]]['abilities'][0].get("trigger") == 'ENTER_PLAY'
+					#and stack_map[game_data['field'][i].size()] in GlobalData.cards[game_data['field'][i][0]]['abilities'][0]["stack_condition"]
+				#): # TODO update with multi abilities when they are released
+					#game_data['action_queue'].append(game_data['field'][i][0]) 
 			game_data['field_vis'][i] = true # Sets vis to true
 			
 	open_phase_rpc()
@@ -429,9 +434,9 @@ func open_phase():
 	# TODO: Handle Enters Effects
 	# Send all the data to the actionqueue object to help
 	if is_lead:
-		open_phase_action_ui('init', player_game_data['action_queue'])
+		open_phase_action_ui('init', card_no_extract_action_queue(GlobalData.player_game_data['action_queue']))
 	else:
-		rpc("open_phase_action_ui", 'init', opp_game_data['action_queue'])
+		rpc("open_phase_action_ui", 'init', card_no_extract_action_queue(GlobalData.opp_game_data['action_queue']))
 		
 @rpc("any_peer", "reliable")
 func open_phase_rpc():
@@ -463,10 +468,12 @@ func open_phase_action_ui(input, action_queue):
 			current_phase = Phase.OPEN
 		cancel_button.text = "No Effects"
 		action_buttons_show()
+		
 		$ActionButtonContainer/ActionButton.hide()
 		
 		# TODO pass action_queue to the $ActionControl
-		print(action_queue)
+		print("Is Server?: ", multiplayer.is_server(), action_queue)
+		action_queue_refresh_rpc(action_queue)
 		$ActionControl/ActionQueue.show()
 		
 	elif input == 'finished':
@@ -479,14 +486,14 @@ func open_phase_action_ui(input, action_queue):
 func open_phase_action_end(input):
 	'''Server based func to count which players have finish completing actions'''
 	open_actions_completed.append(input)
-	
+	print("end actions", opp_action_queue)
 	if open_actions_completed.size() >= 2: #If all players are done reset open_actions_completed and change phase
 		open_actions_completed = []
 		set_phase(Phase.EFFECT_ACTIVATION)
 	elif input == 'server':
-		rpc("open_phase_action_ui", 'init', opp_action_queue)
+		rpc("open_phase_action_ui", 'init', card_no_extract_action_queue(GlobalData.opp_game_data['action_queue']))
 	elif input == 'client':
-		open_phase_action_ui('init', player_action_queue)
+		open_phase_action_ui('init', card_no_extract_action_queue(GlobalData.player_game_data['action_queue']))
 		
 func effect_activation_phase():
 	# TODO: Handle Activate Effects
@@ -501,25 +508,31 @@ func effect_activation_phase():
 	
 	
 	if is_lead:
-		effect_activation_phase_ui('init', GlobalData.player_game_data['action_queue'])
+		effect_activation_phase_ui('init', card_no_extract_action_queue(GlobalData.player_game_data['action_queue']))
 	else:
-		rpc("effect_activation_phase_ui", 'init', GlobalData.opp_game_data['action_queue'])
+		rpc("effect_activation_phase_ui", 'init', card_no_extract_action_queue(GlobalData.opp_game_data['action_queue']))
 
 func action_queue_refresh():
 	''' Refresh both players action queue. This is fine because the non-active player's ui is hidden'''
 	print("Player Action Queue: ", GlobalData.player_game_data['action_queue'])
 	print("Opp Action Queue: ", GlobalData.opp_game_data['action_queue'])
 	# Don't need to determine player to refresh action queue because the non-active player is hidden
-	action_queue_refresh_rpc(GlobalData.player_game_data['action_queue'])
-	rpc("action_queue_refresh_rpc", GlobalData.opp_game_data['action_queue'])
+	#Can't pass action_queue through because it contains card nodes. So we parse it for list of card_no
+	action_queue_refresh_rpc(card_no_extract_action_queue(GlobalData.player_game_data['action_queue']))
+	rpc("action_queue_refresh_rpc", card_no_extract_action_queue(GlobalData.opp_game_data['action_queue']))
 	
+func card_no_extract_action_queue(action_queue):
+	var parsed_queue = []
+	for item in action_queue:
+		parsed_queue.append(item['card'].card_no)
+	return parsed_queue
 	
 @rpc("any_peer", "reliable")
 func action_queue_refresh_rpc(action_queue):
 	action_list.clear()
 	var index = 0
-	for action in action_queue:
-		var card_no = action.get('card').card_no
+	for card_no in action_queue:
+		#var card_no = action.get('card').card_no
 		print("Action List: ", card_no)
 		action_list.add_item("", GlobalData.cards[card_no].image)
 		action_list.set_item_metadata(index, card_no)
@@ -565,9 +578,9 @@ func effect_activation_phase_end(input):
 		activate_actions_completed = []
 		set_phase(Phase.JUDGEMENT)
 	elif input == 'server':
-		rpc("effect_activation_phase_ui", 'init', opp_action_queue)
+		rpc("effect_activation_phase_ui", 'init', card_no_extract_action_queue(GlobalData.opp_game_data['action_queue']))
 	elif input == 'client':
-		effect_activation_phase_ui('init', player_action_queue)
+		effect_activation_phase_ui('init', card_no_extract_action_queue(GlobalData.player_game_data['action_queue']))
 		
 
 
@@ -970,7 +983,7 @@ func configure_hand_ui():
 	action_list.set_allow_reselect(true)
 	action_list.set_allow_rmb_select(true)
 	action_list.set_icon_mode(0)
-	#$OppHand.hovered_item.connect(_preview_card)
+	action_list.hovered_item.connect(_preview_card)
 
 func _clear_hbox_container(hbox):
 	for child in hbox.get_children():
@@ -994,8 +1007,13 @@ func configure_local_test():
 	var IP_ADDRESS = "127.0.0.1"
 	var PORT = 54321
 	if is_server:
+		# Test Activate
 		GlobalData.player_deck.deckdict = {"SD01-002":4,"SD01-004":4,"SD01-005":4,"SD01-014":4,"SD02-014":4}
 		GlobalData.opp_deck.deckdict = {"SD01-002":4,"SD01-004":4,"SD01-005":4,"SD01-014":4,"SD02-014":4}
+		# Test Auto 
+		#GlobalData.player_deck.deckdict = {"SD01-003":4,"SD01-011":4,"SD01-013":4,"SD01-014":4,"SD02-013":4,"SD02-014":4}
+		#GlobalData.opp_deck.deckdict = {"SD01-003":4,"SD01-011":4,"SD01-013":4,"SD01-014":4,"SD02-013":4,"SD02-014":4}
+		
 		GlobalData.player_id = "Server"
 		GlobalData.opp_id = "Client"
 		var peer = ENetMultiplayerPeer.new()

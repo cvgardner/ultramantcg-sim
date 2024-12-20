@@ -299,6 +299,7 @@ layout_mode = 2
 offset_right = 255.0
 offset_bottom = 262.0
 size_flags_vertical = 3
+script = ExtResource("6_g88w0")
 
 [node name="ActionActivateButton" type="Button" parent="ActionControl/ActionQueue"]
 layout_mode = 2

@@ -17,6 +17,30 @@ func _ready() -> void:
 # --- EFFECT ACTIVATION ---
 # ------------------------	
 
+func get_enters_play_effects():
+	'''Gets all the enters play from the field'''
+	
+	# Get Activate Effects for Field
+	for i in range(GlobalData.player_game_data['field_mod'].size()):
+		#Check for player Activate
+		var player_card = GlobalData.cards[GlobalData.player_game_data['field'][i][0]]
+		print("Player Trigger: ",  player_card.abilities[0].get('trigger'))
+		print("Player Stack, Condition: ", GlobalData.player_game_data['field'][i].size(), ' ', player_card.abilities[0].get('stack_condition'))
+		if (player_card.abilities[0].get('trigger') == 'ENTER_PLAY'
+		and GlobalData.player_game_data['field_vis'][i] == false 
+		and GlobalData.stack_map[GlobalData.player_game_data['field'][i].size()] in player_card.abilities[0].get('stack_condition')):
+			GlobalData.player_game_data['action_queue'].append({"card": player_card, "index": i})
+		#Check for Opp cont
+		var opp_card = GlobalData.cards[GlobalData.opp_game_data['field'][i][0]]
+		print("Opp Trigger: ",  opp_card.abilities[0].get('trigger'))
+		print("Opp Stack, Condition: ", GlobalData.opp_game_data['field'][i].size(), ' ', opp_card.abilities[0].get('stack_condition'))
+
+		if (opp_card.abilities[0].get('trigger') == 'ENTER_PLAY'
+		and GlobalData.opp_game_data['field_vis'][i] == false 
+		and GlobalData.stack_map[GlobalData.opp_game_data['field'][i].size()] in opp_card.abilities[0].get('stack_condition')):
+			GlobalData.opp_game_data['action_queue'].append({"card": opp_card, "index": i})
+
+
 func get_activate_effects():
 	'''Gets all the activate effects from the field'''
 	
