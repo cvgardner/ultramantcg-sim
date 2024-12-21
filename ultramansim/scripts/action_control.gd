@@ -2,7 +2,8 @@ extends Control
 
 var action_queue = [] #Array holding all the current actions
 var function_map = {
-	"SELF_BP_CHANGE_OPP_TYPE": self_bp_change_opp_type
+	"SELF_BP_CHANGE_OPP_TYPE": self_bp_change_opp_type,
+	"CHANGE_OPP_TYPE": change_opp_type
 }
 # Signal to update card selector with select_list and only allow selects matching criteria
 signal card_select(select_list, criteria)
@@ -72,16 +73,19 @@ func get_activate_effects():
 	
 func activate_effect(action_index, caller):
 	''' Activating Effects Given the index of the action in action queue'''
+	var action_queue = ['default']
 	if caller == 'server':
-		var action_queue = GlobalData.player_game_data['action_queue']
+		action_queue = GlobalData.player_game_data['action_queue']
 	else:
-		var action_queue = GlobalData.opp_game_data['action_queue']
+		action_queue = GlobalData.opp_game_data['action_queue']
+	print("Player Action Queue ", GlobalData.player_game_data['action_queue'])
+	print("Player: ", caller, " Activated Effect at index: ", action_index, " for queue ", action_queue)
+
 	
 	var card = action_queue[action_index]['card']
-	var ind = action_queue[action_index]['index']
 	for effect in card.abilities[0]['effect']:
 		if effect.get('effect_name') in function_map:
-			function_map[effect['effect_name']].call(card.card_no, card.abilities[0]['effect']['input'], action_queue[action_index])
+			function_map[effect['effect_name']].call(card, effect, action_queue[action_index], caller)
 	
 	# Removefrom queue and update UI
 	action_queue.pop_at(action_index)
@@ -140,6 +144,41 @@ func _process(delta: float) -> void:
 # ------------------------
 # --- EFFECT FUNCTIONS ---
 # ------------------------
+
+func selector(choices):
+	'''Triggers Selector for choices'''
+	#If only one choices just return the one
+	if choices.size() == 0: 
+		return 'empty_selector'
+	elif choices.size() == 1:
+		return choices[0]
+	else: 	# Emit Signal for selector
+
+		pass
+	
+
+func change_opp_type(card, effect, action, caller):
+	'''Waits for a second input on player field and changes the type of the opponent'''
+	# do Selector for type
+	var selected_type = selector(effect['input']['types'])
+	
+	# TODO Get Input from player to select field index
+	
+	
+	# Add type to other player's game_data["field_mod"]
+	if caller == 'server':
+		GlobalData.opp_game_data['field_mod'][action['index']]['type'] = selected_type
+	else:
+		GlobalData.player_game_data['field_mod'][action['index']]['type'] = selected_type
+	
+	print("Type Changed: ", selected_type)
+	print(GlobalData.player_game_data['field_mod'], GlobalData.opp_game_data['field_mod'])
+	
+
+	
+	
+	
+
 
 func self_bp_change_opp_type(card_no, effect_input, extra_input):
 	#check who caller is

@@ -376,16 +376,17 @@ func activate_effect():
 	inputs: caller - determines server/client who is submitting the effect
 	connected to $ActionControl.ActionQueue.ActionActivateButton pressed
 	'''
-	if multiplayer.is_server():
-		activate_effect_rpc('server')
-	else:
-		rpc("activate_effect_rpc", "client")
+	if len($ActionControl/ActionQueue/ActionList.get_selected_items()) > 0:
+		var index = $ActionControl/ActionQueue/ActionList.get_selected_items()[0]
+		if multiplayer.is_server():
+			activate_effect_rpc('server', index)
+		else:
+			rpc("activate_effect_rpc", "client", index)
 
 	
 @rpc("any_peer", "reliable")
-func activate_effect_rpc(caller):
-	if len($ActionControl/ActionQueue/ActionList.get_selected_items()) > 0:
-		$ActionControl.activate_effect($ActionControl/ActionQueue/ActionList.get_selected_items()[0], caller)
+func activate_effect_rpc(caller, index):
+	$ActionControl.activate_effect(index, caller)
 	
 func effect_activated():
 	''' Unsure if I need this function but it might help with handling inputs'''
@@ -747,7 +748,7 @@ func update_field(player, field, field_vis, field_mod):
 	if field.size() < 1:
 		
 		return
-	print(field, field_vis, field_mod)
+	#print(field, field_vis, field_mod)
 	if player == "player":
 		$PlayerField.visualize(field, field_vis, field_mod)
 		for ind in range(0, field_vis.size()):

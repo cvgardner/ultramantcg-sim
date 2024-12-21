@@ -309,10 +309,12 @@
 		"abilities": [
 			{
 				"trigger": "ACTIVATE",
-                "limit": "ONCE_PER_TURN",
-				"target": ["ZERO", "GEED", "Z"],
 				"effect": [{
-					"BATTLE_OPPONENT_CHANGE_TYPE": "ARMED"
+					"effect_name": "CHANGE_OPP_TYPE",
+					"input": {
+						"target_character": ["ZERO", "GEED", "Z"],
+						"types": ["ARMED"]
+					}
 				}]
 			}
 		],
