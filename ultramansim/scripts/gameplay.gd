@@ -100,6 +100,13 @@ func _ready() -> void:
 	$PlayerField.item_clicked.connect(highlight_clicked)
 	$ActionControl/ActionQueue/ActionActivateButton.pressed.connect(activate_effect)
 	$ActionControl.effect_finished.connect(effect_finished)
+	
+	$PlayerField.field_name = 'player'
+	$PlayerField.item_clicked.connect(field_clicked)
+	$OppField.field_name = 'opponent'
+	$OppField.item_clicked.connect(field_clicked)
+	
+	$PlayerHand.card_clicked.connect(hand_clicked)
 
 	
 	#Hide some UI components
@@ -599,6 +606,15 @@ func judgement_phase():
 			pass
 		elif player_power < opp_power:
 			opp_wins += 1
+			
+		# Determine Lead
+		if ind == player_field.size():
+			if player_power > opp_power:
+				is_lead = true # player/server is winning
+			elif player_power < opp_power:
+				is_lead = false # opponent/client is winning
+			else:
+				pass #No Changes to Lead
 	
 	print("Judgement ", player_wins, " ", opp_wins)
 	
@@ -612,13 +628,7 @@ func judgement_phase():
 		game_end(false)
 		rpc("game_end", true)
 	
-	# Determine Lead
-	if player_wins > opp_wins:
-		is_lead = true # player/server is winning
-	elif player_wins < opp_wins:
-		is_lead = false # opponent/client is winning
-	else:
-		pass #No Changes to Lead
+
 	
 	set_phase(Phase.END)
 		
@@ -1120,8 +1130,9 @@ func highlight_none():
 			var card = node.get_child(0)
 			card.hide_highlight()
 			
-func highlight_clicked(clicked_index):
+func highlight_clicked(field_name, clicked_index):
 	'''Processes level up logic when clicking a card that satisfies the level up'''
+	print("Is this working? ", current_phase)
 	if current_phase != Phase.LEVEL_UP: #Skip code if its not the level up phase
 		return
 	if $PlayerHand.get_selected_items().size() > 0:
@@ -1163,8 +1174,30 @@ func highlight_clicked_rpc(caller, selected_ind, selected_card, clicked_index, c
 		emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
 		emit_signal("field_changed", "opponent", opp_field, opp_field_vis, opp_field_mod)
 		rpc("level_up_phase_rpc")
+
+func field_clicked(field_name, item_index):
+	'''Takes the field_clicked signal and passes it to RPC'''
+	if multiplayer.is_server():
+		field_clicked_rpc('server', field_name, item_index)
+	else:
+		rpc("field_clicked_rpc", 'client', field_name, item_index)
 	
 	
+func field_clicked_rpc(caller, field_name, item_index):
+	'''Passes signal info to the Server's action control'''
+	$ActionControl.object_clicked(caller, 'field', field_name, item_index)	
+
+func hand_clicked(item_index):
+	'''Takes the field_clicked signal and passes it to RPC'''
+	if multiplayer.is_server():
+		hand_clicked_rpc('server', item_index)
+	else:
+		rpc("hand_clicked_rpc", 'client', item_index)
+	
+	
+func hand_clicked_rpc(caller, item_index):
+	'''Passes signal info to the Server's action control'''
+	$ActionControl.object_clicked(caller, 'hand', caller, item_index)	
 	
 			
 func update_stack():

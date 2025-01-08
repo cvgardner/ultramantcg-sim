@@ -2,7 +2,7 @@ extends ItemList
 
 var item
 signal hovered_item(item)
-signal card_clicked(item)
+signal card_clicked(item_index)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -19,7 +19,7 @@ func _on_ItemList_gui_input(event: InputEvent) -> void:
 		hovered_item.emit('none')
 		
 func _on_item_select(ind):
-	emit_signal("card_selected", get_item_metadata(ind))
+	card_clicked.emit(ind)
 		
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

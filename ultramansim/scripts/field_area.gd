@@ -3,9 +3,11 @@ extends HBoxContainer
 # Custom HBOX Container containing the field information for Ultraman Battles
 
 var data = [] #This will be a list of lists containing card instances
+var field_name #Distinguish player/opponent fields
+
 #var card = load("res://scenes/card.tscn")
 signal item_hovered(item_card_no)
-signal item_clicked(item_index)
+signal item_clicked(field_name, item_index)
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	self.add_theme_constant_override("separation", 85)
@@ -107,7 +109,7 @@ func _on_child_gui_input(event, wrapper):
 	if event is InputEventMouseButton and event.pressed:
 		#var wrapper = event.target.get_parent()
 		var index = self.get_children().find(wrapper)
-		emit_signal("item_clicked", index)
+		item_clicked.emit(field_name, index)
 		
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.

@@ -201,6 +201,10 @@ func self_bp_change_opp_type(card_no, effect_input, extra_input):
 			#update global field_mod
 			GlobalData.opp_game_data['field_mod'][extra_input['index']]['bp_mod'][card_no] = effect_input['bp_mod']
 
+# --- Signal Processing ---
+func object_clicked(caller, object, field_name, item_index):
+	'''Processes clicks from different elements'''
+	print(caller, object, field_name, item_index)
 		
 # --- Helper Functions ---
 func coalesce(arg_list): 
