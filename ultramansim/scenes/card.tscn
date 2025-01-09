@@ -83,7 +83,6 @@ expand_mode = 1
 stretch_mode = 4
 
 [node name="Level" type="TextureRect" parent="."]
-visible = false
 layout_mode = 1
 offset_left = -19.0
 offset_top = -18.5
@@ -94,9 +93,9 @@ expand_mode = 1
 
 [node name="TYPE" type="TextureRect" parent="."]
 layout_mode = 1
-offset_left = -19.0
-offset_top = -18.5
-offset_right = 21.0
-offset_bottom = 21.5
+offset_left = 4.0
+offset_top = 77.2
+offset_right = 44.0
+offset_bottom = 117.2
 texture = ExtResource("6_v5i45")
 expand_mode = 1
