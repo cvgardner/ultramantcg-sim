@@ -128,6 +128,7 @@ func _ready() -> void:
 	$Stack.texture = ResourceLoader.load("res://images/assets/SINGLE.png")
 	self.curr_stack ='SINGLE'
 	self.curr_type = self.type
+	$TYPE.texture = ResourceLoader.load("res://images/assets/types/{0}.png".format([curr_type]))
 	self.curr_power = self.bp[self.curr_stack]
 	_update_power_text(self.bp['SINGLE'])
 	self.mouse_entered.connect(_on_mouse_entered)
@@ -177,7 +178,7 @@ func flip_face_down():
 	self.face_up = false
 	self.image = ResourceLoader.load(image_path_card_back)
 	$TextureRect.texture = self.image
-	for ui in [$Level, $Power]:
+	for ui in [$Level, $Power, $TYPE]:
 		ui.hide()
 	
 func flip_face_up():
@@ -187,7 +188,7 @@ func flip_face_up():
 	self.face_up = true
 	self.image = ResourceLoader.load(self.image_path)
 	$TextureRect.texture = self.image
-	for ui in [$Level, $Power]:
+	for ui in [$TYPE, $Power]:
 		ui.show()
 
 
@@ -250,6 +251,11 @@ func change_stack(new_stack):
 	self.curr_power = self.bp[new_stack]
 	self._update_power_text(self.curr_power)
 
+func change_type(new_type):
+	''' changes current type based on input new_type
+	input should be "BASIC" "ARMED" "POWER" "SPEED" "HAZARD" "EXTRA"'''
+	curr_type = new_type
+	$TYPE.texture = ResourceLoader.load("res://images/assets/types/{0}.png".format([curr_type]))
 	
 func _on_mouse_entered():
 	print("mouse_entered card node ", self.card_no)

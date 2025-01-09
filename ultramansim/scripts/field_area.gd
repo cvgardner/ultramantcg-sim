@@ -10,7 +10,7 @@ signal item_hovered(item_card_no)
 signal item_clicked(field_name, item_index)
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	self.add_theme_constant_override("separation", 85)
+	self.add_theme_constant_override("separation", 107)
 	pass # Replace with function body.
 	
 
