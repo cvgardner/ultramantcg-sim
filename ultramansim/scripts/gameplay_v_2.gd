@@ -10,6 +10,7 @@ Server -> UI Refresh
 '''
 
 @export var local_test: bool = false
+enum Phase { SETUP, START, DRAW, LEAD_SCENE_SET, SET_CHARACTER, LEVEL_UP, OPEN, EFFECT_ACTIVATION, JUDGEMENT, END}
 
 
 
@@ -28,6 +29,13 @@ func _ready() -> void:
 		print(GlobalData.opp_deck.deckdict)
 		configure_local_test()
 		#Test Connection
+		
+	# --- Connect Signals ---
+	# Connect choose lead signal to UI/Server
+	# Connect game_state_changed UI/Server
+	# Start Game
+	$GameManager.set_phase(Phase.SETUP)
+
 
 func _wait(x):
 	''' wait X seconds'''
@@ -60,6 +68,8 @@ func configure_local_test():
 		peer.create_client(IP_ADDRESS, PORT)
 		get_tree().get_multiplayer().set_multiplayer_peer(peer)
 		print("Setup client", multiplayer.is_server())
+
+
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

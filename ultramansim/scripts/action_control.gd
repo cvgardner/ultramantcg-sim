@@ -3,7 +3,7 @@ extends Control
 var action_queue = [] #Array holding all the current actions
 var function_map = {
 	"SELF_BP_CHANGE_OPP_TYPE": self_bp_change_opp_type,
-	"CHANGE_OPP_TYPE": change_opp_type
+	"GIVE_OPP_TYPE": give_opp_type
 }
 # Signal to update card selector with select_list and only allow selects matching criteria
 signal card_select(select_list, criteria)
@@ -145,7 +145,7 @@ func _process(delta: float) -> void:
 # --- EFFECT FUNCTIONS ---
 # ------------------------
 
-func selector(choices):
+func selector(choices, criteria):
 	'''Triggers Selector for choices'''
 	#If only one choices just return the one
 	if choices.size() == 0: 
@@ -153,23 +153,22 @@ func selector(choices):
 	elif choices.size() == 1:
 		return choices[0]
 	else: 	# Emit Signal for selector
-
+		card_select.emit(choices, criteria)
 		pass
 	
 
-func change_opp_type(card, effect, action, caller):
+func give_opp_type(card, effect, action, caller):
 	'''Waits for a second input on player field and changes the type of the opponent'''
 	# do Selector for type
-	var selected_type = selector(effect['input']['types'])
+	var selected_type = selector(effect['input']['types'], [])
 	
 	# TODO Get Input from player to select field index
 	
-	
 	# Add type to other player's game_data["field_mod"]
 	if caller == 'server':
-		GlobalData.opp_game_data['field_mod'][action['index']]['type'] = selected_type
+		GlobalData.opp_game_data['field_mod'][action['index']]['type'].append(selected_type)
 	else:
-		GlobalData.player_game_data['field_mod'][action['index']]['type'] = selected_type
+		GlobalData.player_game_data['field_mod'][action['index']]['type'].append(selected_type)
 	
 	print("Type Changed: ", selected_type)
 	print(GlobalData.player_game_data['field_mod'], GlobalData.opp_game_data['field_mod'])
@@ -182,22 +181,22 @@ func change_opp_type(card, effect, action, caller):
 
 func self_bp_change_opp_type(card_no, effect_input, extra_input):
 	#check who caller is
-	var player_card_type = coalesce([
-		GlobalData.player_game_data['field_mod'][extra_input['index']].get("type"), 
+	var player_card_type = [
+		GlobalData.player_game_data['field_mod'][extra_input['index']].get("type"),
 		GlobalData.cards[GlobalData.player_game_data['field'][extra_input['index']][0]].type
-	])
-	var opp_card_type = coalesce([
+	]
+	var opp_card_type = [
 		GlobalData.opp_game_data['field_mod'][extra_input['index']].get("type"), 
 		GlobalData.cards[GlobalData.opp_game_data['field'][extra_input['index']][0]].type
-	])
+	]
 	if extra_input['caller'] == 'player':
 		#Check opp type
-		if opp_card_type in effect_input['type']:
+		if effect_input['type'] in opp_card_type:
 			#update global field_mod
 			GlobalData.player_game_data['field_mod'][extra_input['index']]['bp_mod'][card_no] = effect_input['bp_mod']
 	elif extra_input['caller'] == 'opponent':
 		#Check opp type
-		if player_card_type in effect_input['type']:
+		if effect_input['type'] in player_card_type:
 			#update global field_mod
 			GlobalData.opp_game_data['field_mod'][extra_input['index']]['bp_mod'][card_no] = effect_input['bp_mod']
 
