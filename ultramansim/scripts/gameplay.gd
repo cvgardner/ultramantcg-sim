@@ -7,6 +7,7 @@ var is_lead : bool # Boolean signifying if the server is lead or not
 @onready var card_preview = $CardPreview
 @onready var load_deck_options = $GameEndNode/LoadDeckOptions
 @onready var action_list = $ActionControl/ActionQueue/ActionList
+@onready var selector_list = $ActionControl/CardSelector/ScrollContainer/ItemList
 var battle_log_text = "" # String battle log text
 enum Phase { SETUP, START, DRAW, LEAD_SCENE_SET, SET_CHARACTER, LEVEL_UP, OPEN, EFFECT_ACTIVATION, JUDGEMENT, END}
 var current_phase 
@@ -71,6 +72,7 @@ signal start_mulligan
 signal rematch_requested()
 signal open_phase_ability(player_game_data, opp_game_data)
 signal activate_phase_ability(player_game_data, opp_game_data)
+signal selector_button_clicked(index)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -99,7 +101,7 @@ func _ready() -> void:
 	$GameEndNode/RematchButton.pressed.connect(_on_rematch_button_pressed)
 	$PlayerField.item_clicked.connect(highlight_clicked)
 	$ActionControl/ActionQueue/ActionActivateButton.pressed.connect(activate_effect)
-	$ActionControl.effect_finished.connect(effect_finished)
+	$ActionControl.effect_finished_signal.connect(effect_finished)
 	
 	$PlayerField.field_name = 'player'
 	$PlayerField.item_clicked.connect(field_clicked)
@@ -107,6 +109,9 @@ func _ready() -> void:
 	$OppField.item_clicked.connect(field_clicked)
 	
 	$PlayerHand.card_clicked.connect(hand_clicked)
+	
+	# Selector Signals
+	$ActionControl.card_select.connect(activate_selector)
 
 	
 	#Hide some UI components
@@ -274,7 +279,8 @@ func set_character_phase(input, caller):
 			var selected_card_no = GlobalData.player_hand[int(input)]
 			player_field.append([selected_card_no])
 			player_field_vis.append(false)
-			GlobalData.player_game_data['field_mod'].append({"power": {}, "bp_mod": {}})
+			var selected_card_type = GlobalData.cards[selected_card_no]['type']
+			GlobalData.player_game_data['field_mod'].append({"power": {}, "bp_mod": {}, "type": [selected_card_type] })
 			GlobalData.player_hand.pop_at(input)
 			emit_signal("hand_changed", "player", GlobalData.player_hand)
 			emit_signal("field_changed", "player", player_field, player_field_vis, player_field_mod)
@@ -288,7 +294,8 @@ func set_character_phase(input, caller):
 			var selected_card_no = GlobalData.opp_hand[int(input)]
 			opp_field.append([selected_card_no])
 			opp_field_vis.append(false)
-			GlobalData.opp_game_data['field_mod'].append({"power": {}, "bp_mod": {}})
+			var selected_card_type = GlobalData.cards[selected_card_no]['type']
+			GlobalData.opp_game_data['field_mod'].append({"power": {}, "bp_mod": {}, "type":[selected_card_type] })
 			GlobalData.opp_hand.pop_at(input)
 			emit_signal("hand_changed", "opponent", GlobalData.opp_hand)
 			emit_signal("field_changed", "opponent", opp_field, opp_field_vis, opp_field_mod)
@@ -634,7 +641,19 @@ func judgement_phase():
 		
 func end_phase():
 	# TODO: End of Turn Effects
+	
+
+	
+	
 	# TODO: Reset Card power
+	for game_data in [GlobalData.player_game_data, GlobalData.opp_game_data]:
+		for i in len(game_data['field']):
+			var selected_card_type = GlobalData.cards[game_data['field'][i][0]]['type']
+			game_data['field_mod'][i] = {"power": {}, "bp_mod": {}, "type": [selected_card_type] }
+	
+	field_changed.emit("dummy", "dummy", "dummy", "dummy")
+	
+	
 	increase_round()
 	rpc("increase_round")
 	set_phase(Phase.START)
@@ -1204,7 +1223,43 @@ func update_stack():
 	'''Function to update the Single/Double/Triple values of curr_stack and update the associated icon'''
 	#TODO
 	pass
+	
+func activate_selector(choices, criteria):
+	'''Shows selector and populates with choices when card_select is given'''
+	print("Selector Activated")
+	# clear selector
+	for child in selector_list.get_children():
+		self.remove_child(child)
+		child.queue_free()
+	
+	# Populate Selector
+	# Type Choice
+	if criteria == 'type':
+		for type in choices:
+			var type_image = ResourceLoader.load("res://images/assets/types/{0}.png".format([type]))
+			selector_list.add_item("", type_image)
+			
+	#Show Selector
+	$ActionControl/CardSelector.show()
+	print("Showing Selector")
+
+func selector_clicked():
+	''' Returns the index of the selected item emitted in a signal'''
+	if multiplayer.is_server():
+		selector_rpc('server', selector_list.get_selected_items(0))
+	else:
+		rpc('selector_rpc', 'client', selector_list.get_selected_items(0))
+	
+	#Hide Selector
+	$ActionControl/CardSelector.hide()
+	
+	#Emit Signal
+	selector_button_clicked.emit(selector_list.get_selected_items(0))
 		
+func selector_rpc(caller, index):
+	'''Emits signal on server for processing selector click'''
+	selector_button_clicked.emit(caller, 'card', 'selector', selector_list.get_selected_items(0))
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass

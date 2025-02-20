@@ -1,14 +1,14 @@
 [gd_scene load_steps=14 format=3 uid="uid://mvdg5c7lay7c"]
 
 [ext_resource type="Script" path="res://scripts/gameplay.gd" id="1_fwix1"]
-[ext_resource type="Texture2D" uid="uid://dp0r2d64mkguf" path="res://images/assets/UltramanMat.png" id="1_kbc0e"]
-[ext_resource type="Texture2D" uid="uid://bymvcaq8vd6ee" path="res://images/assets/UltramanMat2.png" id="2_vy3aw"]
-[ext_resource type="Texture2D" uid="uid://pv6t32x48leg" path="res://images/assets/card_back.png" id="3_ld4pa"]
+[ext_resource type="Texture2D" uid="uid://btbq2w7lsvcet" path="res://images/assets/UltramanMat.png" id="1_kbc0e"]
+[ext_resource type="Texture2D" uid="uid://cfn8b2555ojk8" path="res://images/assets/UltramanMat2.png" id="2_vy3aw"]
+[ext_resource type="Texture2D" uid="uid://b11my1qfuyvei" path="res://images/assets/card_back.png" id="3_ld4pa"]
 [ext_resource type="Texture2D" uid="uid://bngo215xvukho" path="res://images/cards/BP01-012.webp" id="4_wt1vk"]
 [ext_resource type="Script" path="res://scenes/custom_scene_button.gd" id="5_jiqh6"]
 [ext_resource type="Script" path="res://scripts/CustomItemList.gd" id="6_g88w0"]
 [ext_resource type="Script" path="res://scripts/field_area.gd" id="8_42txr"]
-[ext_resource type="Texture2D" uid="uid://cg1fg42fb5ok1" path="res://images/assets/youwin.png" id="9_5abwo"]
+[ext_resource type="Texture2D" uid="uid://cpvr3nf40a7se" path="res://images/assets/youwin.png" id="9_5abwo"]
 [ext_resource type="Script" path="res://scripts/action_control.gd" id="10_txq2j"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jusy4"]
@@ -319,20 +319,26 @@ layout_mode = 0
 offset_left = 263.0
 offset_top = 6.0
 offset_right = 883.0
-offset_bottom = 127.0
+offset_bottom = 236.0
 color = Color(0.591459, 0.740546, 0.999684, 1)
-
-[node name="ItemList" type="ItemList" parent="ActionControl/CardSelector"]
-layout_mode = 0
-offset_left = 276.0
-offset_top = 10.0
-offset_right = 779.0
-offset_bottom = 124.0
 
 [node name="Button" type="Button" parent="ActionControl/CardSelector"]
 layout_mode = 0
-offset_left = 797.0
-offset_top = 38.0
-offset_right = 875.0
-offset_bottom = 86.0
+offset_left = 792.0
+offset_top = 154.0
+offset_right = 870.0
+offset_bottom = 202.0
 text = "Select"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ActionControl/CardSelector"]
+layout_mode = 0
+offset_left = 294.0
+offset_top = 35.0
+offset_right = 775.0
+offset_bottom = 224.0
+
+[node name="ItemList" type="ItemList" parent="ActionControl/CardSelector/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("6_g88w0")

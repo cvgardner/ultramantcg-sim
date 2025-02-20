@@ -18,7 +18,7 @@ var image_path: String
 # Gameplay Variables
 var curr_stack : String
 var curr_power : int
-var curr_type : String
+var curr_type : Array
 var image_path_card_back = "res://images/assets/card_back.png"
 var face_up : bool
 var stack_map = {
@@ -127,8 +127,8 @@ func _ready() -> void:
 	$Level.texture = ResourceLoader.load("res://images/assets/level_{0}.png".format([str(self.level)]))
 	$Stack.texture = ResourceLoader.load("res://images/assets/SINGLE.png")
 	self.curr_stack ='SINGLE'
-	self.curr_type = self.type
-	$TYPE.texture = ResourceLoader.load("res://images/assets/types/{0}.png".format([curr_type]))
+	self.curr_type = [self.type]
+	change_type(curr_type)
 	self.curr_power = self.bp[self.curr_stack]
 	_update_power_text(self.bp['SINGLE'])
 	self.mouse_entered.connect(_on_mouse_entered)
@@ -178,7 +178,7 @@ func flip_face_down():
 	self.face_up = false
 	self.image = ResourceLoader.load(image_path_card_back)
 	$TextureRect.texture = self.image
-	for ui in [$Level, $Power, $TYPE]:
+	for ui in [$Level, $Power, $TYPES]:
 		ui.hide()
 	
 func flip_face_up():
@@ -188,7 +188,7 @@ func flip_face_up():
 	self.face_up = true
 	self.image = ResourceLoader.load(self.image_path)
 	$TextureRect.texture = self.image
-	for ui in [$TYPE, $Power]:
+	for ui in [$TYPES, $Power]:
 		ui.show()
 
 
@@ -251,12 +251,23 @@ func change_stack(new_stack):
 	self.curr_power = self.bp[new_stack]
 	self._update_power_text(self.curr_power)
 
-func change_type(new_type):
-	''' changes current type based on input new_type
+func change_type(new_types):
+	''' changes current type based on input new_type: Array
 	input should be "BASIC" "ARMED" "POWER" "SPEED" "HAZARD" "EXTRA"'''
-	curr_type = new_type
-	$TYPE.texture = ResourceLoader.load("res://images/assets/types/{0}.png".format([curr_type]))
+	curr_type = new_types
+	#Clear Types vbox
+	for child in $TYPES.get_children():
+		self.remove_child(child)
+		child.queue_free()
 	
+	#Populate Types vboc
+	for type in curr_type:
+		var new_texture = TextureRect.new()
+		new_texture.texture = ResourceLoader.load("res://images/assets/types/{0}.png".format([type]))
+		new_texture.set_size(Vector2(40,40))
+		$TYPES.add_child(new_texture)
+		
+		
 func _on_mouse_entered():
 	print("mouse_entered card node ", self.card_no)
 	emit_signal("card_hovered", self.card_no)

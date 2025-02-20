@@ -74,6 +74,8 @@ func visualize(field, field_vis, field_mod):
 		if not field_vis[i]:
 			new_card.flip_face_down()
 			
+		#Update Type
+		new_card.change_type(field_mod[i].get("type"))	
 		
 		#Modify BP and power based on field_mod
 		var new_bp = 0
@@ -89,7 +91,7 @@ func visualize(field, field_vis, field_mod):
 		var power_mod = 0
 		if field_mod[i].get('power') != null:
 			for power in field_mod[i]['power'].values():
-				if typeof(power) == TYPE_INT:
+				#if typeof(power) == TYPE_INT:
 					power_mod += power
 			new_card.add_power(power_mod)
 		

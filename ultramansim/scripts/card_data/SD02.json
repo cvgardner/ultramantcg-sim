@@ -310,7 +310,7 @@
 			{
 				"trigger": "ACTIVATE",
 				"effect": [{
-					"effect_name": "CHANGE_OPP_TYPE",
+					"effect_name": "GIVE_OPP_TYPE",
 					"input": {
 						"target_character": ["ZERO", "GEED", "Z"],
 						"types": ["ARMED"]

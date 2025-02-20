@@ -310,10 +310,12 @@
 		"abilities": [
 			{
 				"trigger": "ACTIVATE",
-				"limit": "ONCE_PER_TURN",
-				"target": ["TIGA", "DYNA", "GAIA"],
 				"effect": [{
-					"BP_PLUS": 1000
+					"effect_name": "BP_PLUS",
+					"input": {
+						"target_character": ["TIGA", "DYNA", "GAIA"],
+						"power": 1000
+					}
 				}]
 			}
 		],

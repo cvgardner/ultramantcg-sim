@@ -3,15 +3,18 @@ extends Control
 var action_queue = [] #Array holding all the current actions
 var function_map = {
 	"SELF_BP_CHANGE_OPP_TYPE": self_bp_change_opp_type,
-	"GIVE_OPP_TYPE": give_opp_type
+	"GIVE_OPP_TYPE": give_opp_type,
+	"BP_PLUS": bp_plus
 }
 # Signal to update card selector with select_list and only allow selects matching criteria
 signal card_select(select_list, criteria)
 signal effect_activated
-signal effect_finished
+signal effect_finished_signal
+signal object_clicked_signal(caller, object, field_name, item_index)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	effect_finished_signal.connect(effect_finished)
 	pass # Replace with function body.
 	
 # ------------------------
@@ -84,12 +87,13 @@ func activate_effect(action_index, caller):
 	
 	var card = action_queue[action_index]['card']
 	for effect in card.abilities[0]['effect']:
+		print(effect)
 		if effect.get('effect_name') in function_map:
 			function_map[effect['effect_name']].call(card, effect, action_queue[action_index], caller)
 	
 	# Removefrom queue and update UI
+	$ActionQueue/ActionActivateButton.disabled = true #Don't forget to enable again
 	action_queue.pop_at(action_index)
-	emit_signal("effect_finished")
 	
 # ------------------------
 # --- PROCESS CONT     ---
@@ -154,30 +158,74 @@ func selector(choices, criteria):
 		return choices[0]
 	else: 	# Emit Signal for selector
 		card_select.emit(choices, criteria)
-		pass
+		
 	
 
 func give_opp_type(card, effect, action, caller):
 	'''Waits for a second input on player field and changes the type of the opponent'''
-	# do Selector for type
-	var selected_type = selector(effect['input']['types'], [])
+	print("Give Type")
+	# Do Selector for type
+	selector(effect['input']['types'], 'type')
 	
-	# TODO Get Input from player to select field index
+	
+	print("Waiting for Signal")
+	var signal_results = "None"
+	var selected_card = null
+	var target_matched = false
+	while (signal_results[1] != "field"
+		and signal_results[2] != 'player'
+		and target_matched == false):
+		signal_results = await object_clicked_signal
+		if caller == 'server':
+			selected_card = GlobalData.cards[GlobalData.player_game_data['field'][signal_results[3]][0]]
+		else:
+			selected_card = GlobalData.cards[GlobalData.opp_game_data['field'][signal_results[3]][0]]
+		target_matched = target_match(selected_card, effect)	
+
+	print("Signal Results: ", signal_results)
+	var selected_type = effect['input']['types'][signal_results[3]]
+	print(card, effect, action, caller)
 	
 	# Add type to other player's game_data["field_mod"]
 	if caller == 'server':
-		GlobalData.opp_game_data['field_mod'][action['index']]['type'].append(selected_type)
+		GlobalData.opp_game_data['field_mod'][signal_results[3]]['type'].append(selected_type)
 	else:
-		GlobalData.player_game_data['field_mod'][action['index']]['type'].append(selected_type)
+		GlobalData.player_game_data['field_mod'][signal_results[3]]['type'].append(selected_type)
 	
 	print("Type Changed: ", selected_type)
 	print(GlobalData.player_game_data['field_mod'], GlobalData.opp_game_data['field_mod'])
 	
+	effect_finished_signal.emit()
+	
+func bp_plus(card, effect, action, caller):
+	"""Addition of BP to fieldmod"""
+	
+	print("Waiting for Signal")
+	var signal_results = "None"
+	var selected_card = null
+	var target_matched = false
+	while (signal_results[1] != "field"
+		and signal_results[2] != 'player'
+		and target_matched == false):
+		signal_results = await object_clicked_signal
+		if caller == 'server':
+			selected_card = GlobalData.cards[GlobalData.player_game_data['field'][signal_results[3]][0]]
+		else:
+			selected_card = GlobalData.cards[GlobalData.opp_game_data['field'][signal_results[3]][0]]
+		target_matched = target_match(selected_card, effect)
+		print("Signal Results: ", signal_results, selected_card)
+	
+	
+	# Update Fieldmods
+	if caller == 'server':
+		GlobalData.player_game_data['field_mod'][signal_results[3]]['power'][card['card_no']] = effect['input']['power']
+	else:
+		GlobalData.opp_game_data['field_mod'][signal_results[3]]['power'][card['card_no']] = effect['input']['power']
 
-	
-	
-	
+	print("Power Boost")
+	print(GlobalData.player_game_data['field_mod'], GlobalData.opp_game_data['field_mod'])
 
+	effect_finished_signal.emit()
 
 func self_bp_change_opp_type(card_no, effect_input, extra_input):
 	#check who caller is
@@ -204,11 +252,35 @@ func self_bp_change_opp_type(card_no, effect_input, extra_input):
 func object_clicked(caller, object, field_name, item_index):
 	'''Processes clicks from different elements'''
 	print(caller, object, field_name, item_index)
+	object_clicked_signal.emit(caller, object, field_name, item_index)
 		
 # --- Helper Functions ---
+func target_match(card, effect):
+	'''Matches Targets based on effect inputs
+	Args:
+		card: Card Object to test for matching
+		effect: Effect which contains inputs for matching'''	
+	
+	var result = true
+	
+	if card == null: #Check inputs before proceeding
+		return false
+	
+	if effect['input'].get('target_character'):
+		result = card.character in effect['input']['target_character']		
+
+	# TODO add other effect criteria when needed
+
+	return result
+
 func coalesce(arg_list): 
 	'''Coalesce from list input'''
 	for arg in arg_list: 
 		if arg != null: 
 			return arg 
 	return null
+
+func effect_finished():
+	'''Renables activate button and pops effect'''
+	$ActionQueue/ActionActivateButton.disabled = false
+	

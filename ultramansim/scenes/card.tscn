@@ -1,11 +1,11 @@
 [gd_scene load_steps=7 format=3 uid="uid://d1xswdoe8x7gl"]
 
 [ext_resource type="Script" path="res://scripts/Card.gd" id="1_mov5g"]
-[ext_resource type="Texture2D" uid="uid://pv6t32x48leg" path="res://images/assets/card_back.png" id="2_6peeh"]
-[ext_resource type="Texture2D" uid="uid://bytides6pek4t" path="res://images/assets/highlight.png" id="2_6tgyd"]
-[ext_resource type="Texture2D" uid="uid://ds4kkx6jrigu5" path="res://images/assets/SINGLE.png" id="3_rsri4"]
-[ext_resource type="Texture2D" uid="uid://rx2p7sh06nrc" path="res://images/assets/level_1.png" id="4_poptm"]
-[ext_resource type="Texture2D" uid="uid://ckmwvt1e80nw0" path="res://images/assets/types/ARMED.png" id="6_v5i45"]
+[ext_resource type="Texture2D" uid="uid://b11my1qfuyvei" path="res://images/assets/card_back.png" id="2_6peeh"]
+[ext_resource type="Texture2D" uid="uid://b16u38nydob34" path="res://images/assets/highlight.png" id="2_6tgyd"]
+[ext_resource type="Texture2D" uid="uid://bpclohwyrob2o" path="res://images/assets/SINGLE.png" id="3_rsri4"]
+[ext_resource type="Texture2D" uid="uid://bi5t3m1dxbbpj" path="res://images/assets/level_1.png" id="4_poptm"]
+[ext_resource type="Texture2D" uid="uid://dgnl2s0231jdk" path="res://images/assets/types/ARMED.png" id="6_v5i45"]
 
 [node name="card" type="Control"]
 custom_minimum_size = Vector2(50, 75)
@@ -91,11 +91,19 @@ offset_bottom = 21.5
 texture = ExtResource("4_poptm")
 expand_mode = 1
 
-[node name="TYPE" type="TextureRect" parent="."]
-layout_mode = 1
+[node name="TYPES" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(50, 25)
+layout_mode = 0
 offset_left = 4.0
-offset_top = 77.2
-offset_right = 44.0
-offset_bottom = 117.2
+offset_top = 80.4
+offset_right = 204.0
+offset_bottom = 180.4
+scale = Vector2(0.25, 0.25)
+theme_override_constants/separation = 0
+
+[node name="TYPE" type="TextureRect" parent="TYPES"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_vertical = 3
 texture = ExtResource("6_v5i45")
-expand_mode = 1
+expand_mode = 4
